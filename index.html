@@ -1,0 +1,1332 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#3767F0"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
+<style>:root{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}body{margin:0}[hidden]{display:none!important}</style>
+</head><body>
+<title>Lenguaventura</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;700;800&display=swap">
+<style>
+/* Layout: una columna central tipo "cuaderno de misiones"; cada mundo tiene su color */
+:root{
+  --bg:#EEF2FB; --surface:#FFFFFF; --surface2:#F5F7FD; --ink:#1B2545; --muted:#5D6787; --line:#D9DFEF;
+  --accent:#FF6B35; --accent-ink:#FFFFFF;
+  --c1:#3767F0; --c2:#E0457B; --c3:#14A06C; --c4:#E59A00; --c5:#7B5CF0; --c6:#0E8F9B; --c7:#9A5B22; --c8:#B0388F; --c9:#C2410C; --c10:#4D7C0F; --c11:#BE123C;
+  --ok:#139A52; --ok-bg:#DDF5E7; --ko:#D23F3F; --ko-bg:#FBE1E1; --star:#FFB400;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Nunito","Segoe UI",system-ui,sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111729; --surface:#1B2340; --surface2:#222C4E; --ink:#E9EDFF; --muted:#A3ADD0; --line:#2F3A63;
+  --accent:#FF8350; --accent-ink:#1B1200;
+  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185;
+  --ok:#4BD98A; --ok-bg:#183C2B; --ko:#FF7B7B; --ko-bg:#4A2026; --star:#FFC83D; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111729; --surface:#1B2340; --surface2:#222C4E; --ink:#E9EDFF; --muted:#A3ADD0; --line:#2F3A63;
+  --accent:#FF8350; --accent-ink:#1B1200;
+  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185;
+  --ok:#4BD98A; --ok-bg:#183C2B; --ko:#FF7B7B; --ko-bg:#4A2026; --star:#FFC83D; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.45;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:820px;margin:0 auto;padding-block:16px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 22px;border-radius:14px;font-weight:800;font-size:17px;background:var(--accent);color:var(--accent-ink);box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.btn.sec{background:var(--surface);color:var(--ink);box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+.btn.sm{min-height:42px;padding:0 14px;font-size:15px}
+.muted{color:var(--muted)}
+
+/* Cabecera */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.who{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 16px 4px 4px;font-weight:800}
+.ava{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--surface2)}
+.chips{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:800;font-variant-numeric:tabular-nums}
+.coin{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE38A,#F2A900 70%);box-shadow:inset 0 -2px 0 #C98500}
+
+/* Perfiles */
+.pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
+.pcard{background:var(--surface);border:3px solid var(--line);border-radius:24px;padding:26px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;font-family:var(--display);font-size:28px;font-weight:800}
+.pcard .ava{width:96px;height:96px;font-size:58px}
+.pcard:active{transform:scale(.98)}
+.hero{padding-block:12px 8px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.logo{width:min(180px,40vw);height:auto;border-radius:28px;box-shadow:0 8px 24px color-mix(in srgb,var(--ink) 18%,transparent)}
+.hero h1{font-size:clamp(38px,7vw,58px);letter-spacing:-.5px}
+.hero h1 span{color:var(--accent)}
+.hero p{margin:6px 0 0;color:var(--muted);font-size:18px}
+
+/* Mapa */
+.worlds{display:grid;gap:16px}
+.world{background:var(--surface);border-radius:var(--r);border:2px solid var(--line);overflow:hidden}
+.whead{display:flex;align-items:center;gap:14px;padding:16px 18px;background:color-mix(in srgb,var(--wc) 14%,var(--surface))}
+.wicon{width:52px;height:52px;border-radius:14px;background:var(--wc);color:#fff;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;flex:none}
+.whead h2{font-size:24px}
+.whead p{margin:0;color:var(--muted);font-size:15px}
+.whead .btn{margin-left:auto}
+.levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;padding:14px}
+.lvl{min-height:104px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px}
+.lvl b{font-family:var(--display);font-size:17px;line-height:1.15}
+.lvl small{color:var(--muted);font-size:13px;line-height:1.25}
+.lvl .stars{margin-top:auto}
+.lvl.open{border-color:var(--wc);box-shadow:0 3px 0 color-mix(in srgb,var(--wc) 55%,transparent)}
+.lvl.locked{opacity:.55}
+.stars{display:flex;gap:2px;font-size:18px;color:var(--line)}
+.stars .on{color:var(--star)}
+.extras{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:16px}
+.xcard{background:var(--surface);border:2px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;display:flex;gap:14px;align-items:center}
+.xcard .wicon{background:var(--wc)}
+.xcard b{font-family:var(--display);font-size:20px;display:block}
+.xcard small{color:var(--muted)}
+@media (max-width:560px){.levels{grid-template-columns:1fr}.lvl{min-height:0}.whead .btn{display:none}}
+
+/* Juego */
+.gbar{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.prog{flex:1;height:14px;border-radius:99px;background:var(--surface);border:2px solid var(--line);overflow:hidden}
+.prog i{display:block;height:100%;background:var(--wc,var(--accent));border-radius:99px;transition:width .3s}
+.x{width:44px;height:44px;border-radius:12px;background:var(--surface);border:2px solid var(--line);font-size:22px;font-weight:800}
+.card{background:var(--surface);border:2px solid var(--line);border-radius:22px;padding:22px}
+.tema{display:inline-block;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--wc,var(--accent));margin-bottom:6px}
+.enun{font-family:var(--display);font-size:clamp(24px,4.4vw,32px);font-weight:700;line-height:1.15}
+.sub{margin-top:6px;color:var(--muted);font-weight:700}
+.frase{margin-top:14px;font-size:22px;background:var(--surface2);border-radius:14px;padding:14px 16px;line-height:1.7}
+.frase mark{background:color-mix(in srgb,var(--wc,var(--accent)) 25%,transparent);color:inherit;border-bottom:3px solid var(--wc,var(--accent));padding:0 3px;border-radius:4px;font-weight:800}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:18px}
+.opt{min-height:64px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);padding:10px 14px;font-weight:800;font-size:18px;text-align:left;box-shadow:0 3px 0 var(--line)}
+.opt:active{transform:translateY(2px)}
+.opt.good{background:var(--ok-bg);border-color:var(--ok);box-shadow:0 3px 0 var(--ok)}
+.opt.bad{background:var(--ko-bg);border-color:var(--ko);box-shadow:0 3px 0 var(--ko)}
+.opt:disabled{cursor:default}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.words{display:flex;flex-wrap:wrap;gap:6px 4px;align-items:baseline;margin-top:16px;font-size:22px;background:var(--surface2);padding:14px;border-radius:14px}
+.word{padding:6px 10px;border-radius:10px;border:2px solid var(--line);background:var(--surface);font-weight:700}
+.word.good{background:var(--ok-bg);border-color:var(--ok)}
+.word.bad{background:var(--ko-bg);border-color:var(--ko)}
+.write{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}
+.write input{flex:1;min-width:0;min-height:58px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);color:var(--ink);font:inherit;font-size:22px;font-weight:700;padding:0 16px}
+.write input.good{border-color:var(--ok);background:var(--ok-bg)}
+.write input.bad{border-color:var(--ko);background:var(--ko-bg)}
+.keys{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.keys button{width:46px;height:44px;border-radius:10px;border:2px solid var(--line);background:var(--surface);font-weight:800;font-size:20px}
+.fb{margin-top:16px;border-radius:16px;padding:14px 16px;display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap}
+.fb.good{background:var(--ok-bg)}
+.fb.bad{background:var(--ko-bg)}
+.fb .t{font-family:var(--display);font-size:24px;font-weight:800}
+.fb.good .t{color:var(--ok)} .fb.bad .t{color:var(--ko)}
+.fb p{margin:2px 0 0}
+.fb .body{flex:1;min-width:220px}
+.fb .btn{align-self:center}
+.timer{font-family:var(--display);font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;min-width:64px;text-align:right}
+.streak{font-weight:800;color:var(--accent)}
+
+.order{display:grid;gap:10px;margin-top:18px}
+.oitem{display:flex;align-items:center;gap:12px;min-height:58px;border-radius:14px;border:2px solid var(--line);background:var(--surface2);padding:8px 14px;text-align:left;font-weight:700;font-size:17px}
+.oitem .n{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:2px dashed var(--line);font-family:var(--display);font-weight:800}
+.oitem.sel .n{background:var(--wc,var(--accent));border:0;color:#fff}
+.oitem.good{border-color:var(--ok);background:var(--ok-bg)} .oitem.bad{border-color:var(--ko);background:var(--ko-bg)}
+.lectura{background:var(--surface2);border-radius:14px;padding:14px 16px;margin-top:10px}
+.lectura p{margin:6px 0}
+.lectura .parte{font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--c7)}
+/* Resultado */
+.res{text-align:center;padding:30px 20px}
+.bigstars{display:flex;justify-content:center;gap:10px;font-size:64px;color:var(--line);margin:10px 0}
+.bigstars .on{color:var(--star);animation:pop .5s both}
+.bigstars .on:nth-child(2){animation-delay:.2s}.bigstars .on:nth-child(3){animation-delay:.4s}
+@keyframes pop{0%{transform:scale(0)}70%{transform:scale(1.25)}100%{transform:scale(1)}}
+.res .score{font-family:var(--display);font-size:44px;font-weight:800}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:18px}
+
+/* Teoría */
+.theory h2{font-size:28px;margin-bottom:8px}
+.theory h3{font-size:21px;margin:18px 0 6px}
+.theory p,.theory li{max-width:65ch}
+.tbl{overflow-x:auto;margin-top:8px}
+table{border-collapse:collapse;font-size:15px;min-width:100%}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;white-space:nowrap}
+th{background:var(--surface2);font-size:13px}
+td.irr{color:var(--c2);font-weight:800}
+.tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.tbox{background:var(--surface2);border-radius:14px;padding:12px 14px}
+.tbox b{font-family:var(--display);font-size:17px}
+.tbox .alias{color:var(--muted);font-size:14px}
+select{font:inherit;font-weight:700;min-height:46px;border-radius:12px;border:2px solid var(--line);background:var(--surface2);color:var(--ink);padding:0 10px}
+
+/* Familia */
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center}
+.bar .tr{height:14px;background:var(--surface2);border-radius:9px;overflow:hidden}
+.bar .tr i{display:block;height:100%;background:var(--c3)}
+.bar span{font-variant-numeric:tabular-nums;font-weight:800;text-align:right}
+.list{display:grid;gap:6px;margin:0;padding:0;list-style:none}
+.list li{background:var(--surface2);border-radius:10px;padding:8px 12px;display:flex;justify-content:space-between;gap:10px}
+.tabs{display:flex;gap:8px;margin:10px 0 16px;flex-wrap:wrap}
+.tabs button{padding:8px 16px;border-radius:999px;border:2px solid var(--line);font-weight:800;background:var(--surface)}
+.tabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.avs{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.avs button{width:56px;height:56px;border-radius:14px;font-size:32px;border:2px solid var(--line);background:var(--surface2)}
+.avs button[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,var(--surface))}
+.confirm{margin-top:10px;background:var(--ko-bg);border-radius:12px;padding:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+canvas#conf{position:fixed;inset:0;pointer-events:none;z-index:50}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<canvas id="conf" hidden></canvas>
+<div class="wrap" id="app"></div>
+
+<script>
+"use strict";
+/* ============ utilidades ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; };
+const uniq = a => [...new Set(a)];
+const sinTilde = s => s.replace(/ñ/g,'\u0001').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\u0001/g,'ñ');
+const norm = s => s.toLowerCase().trim().replace(/\s+/g,' ').replace(/[.,;:!¡?¿]+$/,'');
+
+/* ============ VERBOS ============ */
+const PERS = [
+  {pr:'yo', lab:'1ª persona del singular'},
+  {pr:'tú', lab:'2ª persona del singular'},
+  {pr:'él / ella / usted', lab:'3ª persona del singular'},
+  {pr:'nosotros/as', lab:'1ª persona del plural'},
+  {pr:'vosotros/as', lab:'2ª persona del plural'},
+  {pr:'ellos / ellas / ustedes', lab:'3ª persona del plural'},
+];
+const HABER = {
+  pres:['he','has','ha','hemos','habéis','han'],
+  impf:['había','habías','había','habíamos','habíais','habían'],
+  pps:['hube','hubiste','hubo','hubimos','hubisteis','hubieron'],
+  fut:['habré','habrás','habrá','habremos','habréis','habrán'],
+  cond:['habría','habrías','habría','habríamos','habríais','habrían'],
+  spres:['haya','hayas','haya','hayamos','hayáis','hayan'],
+  simpf:['hubiera','hubieras','hubiera','hubiéramos','hubierais','hubieran'],
+  sfut:['hubiere','hubieres','hubiere','hubiéremos','hubiereis','hubieren'],
+};
+// n = nombre (libro SM / RAE), b = nombre de Bello que también aparece en el libro, u = uso
+const T = [
+  {id:'pres', n:'Presente', b:'presente', m:'ind', u:'Acción que ocurre ahora o habitualmente.'},
+  {id:'pps', n:'Pretérito perfecto simple', b:'pretérito', m:'ind', u:'Acción pasada y terminada.'},
+  {id:'impf', n:'Pretérito imperfecto', b:'copretérito', m:'ind', u:'Acción pasada sin indicar su final; describe o expresa costumbre.'},
+  {id:'fut', n:'Futuro simple', b:'futuro', m:'ind', u:'Acción que ocurrirá.'},
+  {id:'cond', n:'Condicional simple', b:'pospretérito', m:'ind', u:'Acción posible o que depende de una condición.'},
+  {id:'ppc', n:'Pretérito perfecto compuesto', b:'antepresente', m:'ind', aux:'pres', u:'Acción pasada con relación con el presente.'},
+  {id:'plus', n:'Pretérito pluscuamperfecto', b:'antecopretérito', m:'ind', aux:'impf', u:'Acción pasada que ocurrió antes de otra pasada.'},
+  {id:'pant', n:'Pretérito anterior', b:'antepretérito', m:'ind', aux:'pps', u:'Acción pasada inmediatamente anterior a otra (poco usado).'},
+  {id:'futc', n:'Futuro compuesto', b:'antefuturo', m:'ind', aux:'fut', u:'Acción que estará terminada en el futuro.'},
+  {id:'condc', n:'Condicional compuesto', b:'antepospretérito', m:'ind', aux:'cond', u:'Acción que podría haber ocurrido si se hubiera cumplido una condición.'},
+  {id:'spres', n:'Presente', b:'presente', m:'sub', u:'Deseo, duda o posibilidad en presente o futuro.'},
+  {id:'simpf', n:'Pretérito imperfecto', b:'pretérito', m:'sub', u:'Deseo o hipótesis en pasado. Tiene dos formas: -ra / -se.'},
+  {id:'sfut', n:'Futuro simple', b:'futuro', m:'sub', u:'Casi no se usa hoy (refranes, textos legales).'},
+  {id:'sppc', n:'Pretérito perfecto compuesto', b:'antepresente', m:'sub', aux:'spres', u:'Deseo o duda sobre algo ya terminado.'},
+  {id:'splus', n:'Pretérito pluscuamperfecto', b:'antepretérito', m:'sub', aux:'simpf', u:'Hipótesis sobre el pasado que no se cumplió.'},
+  {id:'sfutc', n:'Futuro compuesto', b:'antefuturo', m:'sub', aux:'sfut', u:'Casi no se usa hoy.'},
+];
+const TI = Object.fromEntries(T.map(t=>[t.id,t]));
+const modo = t => t.m==='ind' ? 'indicativo' : 'subjuntivo';
+const tLab = t => `${t.n} de ${modo(t)}`;
+const IND_S = ['pres','pps','impf','fut','cond'];
+const IND_C = ['ppc','plus','pant','futc','condc'];
+const SUB_S = ['spres','simpf','sfut'];
+const SUB_C = ['sppc','splus','sfutc'];
+const IND = [...IND_S, ...IND_C], SUB = [...SUB_S, ...SUB_C], ALLT = [...IND, ...SUB];
+
+const END = {
+  pres:[['o','as','a','amos','áis','an'],['o','es','e','emos','éis','en'],['o','es','e','imos','ís','en']],
+  pps:[['é','aste','ó','amos','asteis','aron'],['í','iste','ió','imos','isteis','ieron'],['í','iste','ió','imos','isteis','ieron']],
+  impf:[['aba','abas','aba','ábamos','abais','aban'],['ía','ías','ía','íamos','íais','ían'],['ía','ías','ía','íamos','íais','ían']],
+  spres:[['e','es','e','emos','éis','en'],['a','as','a','amos','áis','an'],['a','as','a','amos','áis','an']],
+};
+const FUT=['é','ás','á','emos','éis','án'], COND=['ía','ías','ía','íamos','íais','ían'];
+const SIMPF=['ra','ras','ra','ramos','rais','ran'], SFUT=['re','res','re','remos','reis','ren'];
+const grupo = inf => { const e=sinTilde(inf).slice(-2); return e==='ar'?0:e==='er'?1:2; };
+const tildeFinal = st => st.replace(/[ae]$/, m=>({a:'á',e:'é'})[m]);
+const fromPret = (p3, suf) => { const st=p3.slice(0,-3); return suf.map((s,i)=>(i===3?tildeFinal(st):st)+s); };
+function reg(inf, tid){
+  const g=grupo(inf), st=inf.slice(0,-2), base=sinTilde(inf);
+  if(END[tid]) return END[tid][g].map(e=>st+e);
+  if(tid==='fut') return FUT.map(e=>base+e);
+  if(tid==='cond') return COND.map(e=>base+e);
+  if(tid==='simpf') return fromPret(reg(inf,'pps')[5], SIMPF);
+  if(tid==='sfut') return fromPret(reg(inf,'pps')[5], SFUT);
+}
+function simple(v, tid){
+  if(Array.isArray(v[tid])) return v[tid];
+  if((tid==='fut'||tid==='cond') && v.fut) return (tid==='fut'?FUT:COND).map(e=>v.fut+e);
+  if(tid==='simpf') return fromPret(simple(v,'pps')[5], SIMPF);
+  if(tid==='sfut') return fromPret(simple(v,'pps')[5], SFUT);
+  return reg(v.inf, tid);
+}
+const partReg = inf => sinTilde(inf).slice(0,-2) + (grupo(inf)===0 ? 'ado' : 'ido');
+const part = v => v.part || partReg(v.inf);
+const gerReg = inf => inf.slice(0,-2) + (grupo(inf)===0 ? 'ando' : 'iendo');
+function conj(v, tid){ const t=TI[tid]; return t.aux ? HABER[t.aux].map(h=>h+' '+part(v)) : simple(v, tid); }
+const conjReg = (v, tid) => conj({inf:v.inf}, tid);
+const formaSe = f => { const w=f.split(' '); w[0]=w[0].replace(/r(a|as|amos|ais|an)$/, (m,s)=>'s'+s.replace(/^a/,'e')).replace(/ráramos$/,'rásemos'); return w.join(' '); };
+
+const REG = ['cantar','amar','saltar','bailar','mirar','estudiar','hablar','nadar','pintar','ayudar','viajar','comer','beber','correr','aprender','temer','meter','vivir','subir','partir','recibir','decidir','escribir','abrir','romper']
+  .map(inf => ({inf, part:{escribir:'escrito',abrir:'abierto',romper:'roto'}[inf]}));
+const REG_SIMPLE = REG.filter(v=>!v.part);
+
+const IRR = [
+ {inf:'ser', pres:['soy','eres','es','somos','sois','son'], pps:['fui','fuiste','fue','fuimos','fuisteis','fueron'], impf:['era','eras','era','éramos','erais','eran'], spres:['sea','seas','sea','seamos','seáis','sean']},
+ {inf:'estar', pres:['estoy','estás','está','estamos','estáis','están'], pps:['estuve','estuviste','estuvo','estuvimos','estuvisteis','estuvieron'], spres:['esté','estés','esté','estemos','estéis','estén']},
+ {inf:'ir', pres:['voy','vas','va','vamos','vais','van'], pps:['fui','fuiste','fue','fuimos','fuisteis','fueron'], impf:['iba','ibas','iba','íbamos','ibais','iban'], spres:['vaya','vayas','vaya','vayamos','vayáis','vayan']},
+ {inf:'tener', pres:['tengo','tienes','tiene','tenemos','tenéis','tienen'], pps:['tuve','tuviste','tuvo','tuvimos','tuvisteis','tuvieron'], fut:'tendr', spres:['tenga','tengas','tenga','tengamos','tengáis','tengan']},
+ {inf:'hacer', pres:['hago','haces','hace','hacemos','hacéis','hacen'], pps:['hice','hiciste','hizo','hicimos','hicisteis','hicieron'], fut:'har', spres:['haga','hagas','haga','hagamos','hagáis','hagan'], part:'hecho'},
+ {inf:'decir', pres:['digo','dices','dice','decimos','decís','dicen'], pps:['dije','dijiste','dijo','dijimos','dijisteis','dijeron'], fut:'dir', spres:['diga','digas','diga','digamos','digáis','digan'], part:'dicho'},
+ {inf:'poder', pres:['puedo','puedes','puede','podemos','podéis','pueden'], pps:['pude','pudiste','pudo','pudimos','pudisteis','pudieron'], fut:'podr', spres:['pueda','puedas','pueda','podamos','podáis','puedan']},
+ {inf:'poner', pres:['pongo','pones','pone','ponemos','ponéis','ponen'], pps:['puse','pusiste','puso','pusimos','pusisteis','pusieron'], fut:'pondr', spres:['ponga','pongas','ponga','pongamos','pongáis','pongan'], part:'puesto'},
+ {inf:'querer', pres:['quiero','quieres','quiere','queremos','queréis','quieren'], pps:['quise','quisiste','quiso','quisimos','quisisteis','quisieron'], fut:'querr', spres:['quiera','quieras','quiera','queramos','queráis','quieran']},
+ {inf:'saber', pres:['sé','sabes','sabe','sabemos','sabéis','saben'], pps:['supe','supiste','supo','supimos','supisteis','supieron'], fut:'sabr', spres:['sepa','sepas','sepa','sepamos','sepáis','sepan']},
+ {inf:'venir', pres:['vengo','vienes','viene','venimos','venís','vienen'], pps:['vine','viniste','vino','vinimos','vinisteis','vinieron'], fut:'vendr', spres:['venga','vengas','venga','vengamos','vengáis','vengan']},
+ {inf:'traer', pres:['traigo','traes','trae','traemos','traéis','traen'], pps:['traje','trajiste','trajo','trajimos','trajisteis','trajeron'], spres:['traiga','traigas','traiga','traigamos','traigáis','traigan'], part:'traído'},
+ {inf:'caber', pres:['quepo','cabes','cabe','cabemos','cabéis','caben'], pps:['cupe','cupiste','cupo','cupimos','cupisteis','cupieron'], fut:'cabr', spres:['quepa','quepas','quepa','quepamos','quepáis','quepan']},
+ {inf:'andar', pps:['anduve','anduviste','anduvo','anduvimos','anduvisteis','anduvieron']},
+ {inf:'conducir', pres:['conduzco','conduces','conduce','conducimos','conducís','conducen'], pps:['conduje','condujiste','condujo','condujimos','condujisteis','condujeron'], spres:['conduzca','conduzcas','conduzca','conduzcamos','conduzcáis','conduzcan']},
+ {inf:'oír', pres:['oigo','oyes','oye','oímos','oís','oyen'], pps:['oí','oíste','oyó','oímos','oísteis','oyeron'], spres:['oiga','oigas','oiga','oigamos','oigáis','oigan'], part:'oído'},
+ {inf:'caer', pres:['caigo','caes','cae','caemos','caéis','caen'], pps:['caí','caíste','cayó','caímos','caísteis','cayeron'], spres:['caiga','caigas','caiga','caigamos','caigáis','caigan'], part:'caído'},
+ {inf:'dormir', pres:['duermo','duermes','duerme','dormimos','dormís','duermen'], pps:['dormí','dormiste','durmió','dormimos','dormisteis','durmieron'], spres:['duerma','duermas','duerma','durmamos','durmáis','duerman']},
+ {inf:'pedir', pres:['pido','pides','pide','pedimos','pedís','piden'], pps:['pedí','pediste','pidió','pedimos','pedisteis','pidieron'], spres:['pida','pidas','pida','pidamos','pidáis','pidan']},
+ {inf:'jugar', pres:['juego','juegas','juega','jugamos','jugáis','juegan'], pps:['jugué','jugaste','jugó','jugamos','jugasteis','jugaron'], spres:['juegue','juegues','juegue','juguemos','juguéis','jueguen']},
+ {inf:'pensar', pres:['pienso','piensas','piensa','pensamos','pensáis','piensan'], spres:['piense','pienses','piense','pensemos','penséis','piensen']},
+ {inf:'volver', pres:['vuelvo','vuelves','vuelve','volvemos','volvéis','vuelven'], spres:['vuelva','vuelvas','vuelva','volvamos','volváis','vuelvan'], part:'vuelto'},
+ {inf:'salir', pres:['salgo','sales','sale','salimos','salís','salen'], fut:'saldr', spres:['salga','salgas','salga','salgamos','salgáis','salgan']},
+ {inf:'dar', pres:['doy','das','da','damos','dais','dan'], pps:['di','diste','dio','dimos','disteis','dieron'], spres:['dé','des','dé','demos','deis','den']},
+ {inf:'ver', pres:['veo','ves','ve','vemos','veis','ven'], pps:['vi','viste','vio','vimos','visteis','vieron'], impf:['veía','veías','veía','veíamos','veíais','veían'], spres:['vea','veas','vea','veamos','veáis','vean'], part:'visto'},
+];
+const IMP_TU = {tener:'ten', hacer:'haz', decir:'di', poner:'pon', venir:'ven', salir:'sal', ser:'sé', ir:'ve'};
+const PARTX = [...IRR.filter(v=>v.part && !['traer','caer','oír'].includes(v.inf)), ...REG.filter(v=>v.part),
+  {inf:'morir',part:'muerto'},{inf:'resolver',part:'resuelto'},{inf:'descubrir',part:'descubierto'},{inf:'devolver',part:'devuelto'},{inf:'cubrir',part:'cubierto'},{inf:'deshacer',part:'deshecho'}];
+const VERBO = Object.fromEntries([...REG, ...IRR].map(v=>[v.inf, v]));
+
+const personasDe = (v,tid,f) => conj(v,tid).map((x,i)=>x===f?i:-1).filter(i=>i>=0);
+function expTiempo(v, t, f){
+  const ps = personasDe(v, t.id, f).map(i=>PERS[i].lab).join(' o ');
+  if(t.aux){
+    const h = f.split(' ')[0];
+    return `Tiempo compuesto: «${h}» (haber en ${TI[t.aux].n.toLowerCase()}) + participio «${part(v)}». También se llama ${t.b}. ${ps}.`;
+  }
+  return `Tiempo simple: el verbo va en una sola palabra. También se llama ${t.b}. ${ps}.`;
+}
+
+/* ---- generadores de verbos ---- */
+function qIdent(ask, opt, verbs){
+  const v=pick(verbs), t=TI[pick(ask)], f=conj(v,t.id)[rnd(6)];
+  const match = ALLT.filter(id=>conj(v,id).includes(f));
+  const otros = shuffle(opt.filter(id=>!match.includes(id))).slice(0,3);
+  return {tipo:'test', tema:'Identificar el tiempo', enun:`¿En qué tiempo está «${f}»?`, sub:`Verbo ${v.inf}`,
+    opciones: shuffle([t.id, ...otros]).map(id=>tLab(TI[id])), resp:tLab(t), exp:expTiempo(v,t,f)};
+}
+function qPersona(verbs, tenses){
+  for(let k=0;k<40;k++){
+    const v=pick(verbs), t=TI[pick(tenses)], p=rnd(6), f=conj(v,t.id)[p];
+    if(personasDe(v,t.id,f).length>1) continue;
+    const otros = shuffle([0,1,2,3,4,5].filter(i=>i!==p)).slice(0,3);
+    return {tipo:'test', tema:'Persona y número', enun:`¿Qué persona y número es «${f}»?`, sub:`${v.inf} · ${tLab(t)}`,
+      opciones: shuffle([p,...otros]).map(i=>PERS[i].lab), resp:PERS[p].lab, exp:`«${f}» va con ${PERS[p].pr}: ${PERS[p].lab}.`};
+  }
+  return qIdent(tenses, tenses, verbs);
+}
+function qSimpleComp(verbs, tenses){
+  const v=pick(verbs), t=TI[pick(tenses)], f=conj(v,t.id)[rnd(6)], dice=Math.random()<.5?'compuesto':'simple';
+  return {tipo:'vf', tema:'Simple o compuesto', enun:`«${f}» es un tiempo ${dice}.`, resp: (dice==='compuesto')===!!t.aux,
+    exp:`«${f}» es ${tLab(t).toLowerCase()}. ${t.aux?'Los tiempos compuestos llevan haber + participio.':'Los tiempos simples son una sola palabra.'}`};
+}
+function qModo(verbs, tenses){
+  const v=pick(verbs), t=TI[pick(tenses)], f=conj(v,t.id)[rnd(6)];
+  if(ALLT.filter(id=>TI[id].m!==t.m && conj(v,id).includes(f)).length) return qIdent(tenses,tenses,verbs);
+  return {tipo:'test', tema:'Modo verbal', enun:`¿En qué modo está «${f}»?`, sub:`Verbo ${v.inf}`, opciones:['Indicativo','Subjuntivo'],
+    resp: t.m==='ind'?'Indicativo':'Subjuntivo', exp:`Es ${tLab(t).toLowerCase()}. ${t.m==='ind'?'El indicativo presenta hechos reales.':'El subjuntivo expresa deseos, dudas o posibilidades (que yo…, ojalá…).'}`};
+}
+function qBello(tenses){
+  const t=TI[pick(tenses)];
+  const pool = uniq(T.map(x=>x.b)).filter(b=>b!==t.b);
+  return {tipo:'test', tema:'Otros nombres', enun:`¿Qué otro nombre recibe el ${tLab(t).toLowerCase()}?`, sub:'En tu libro aparecen los dos nombres',
+    opciones: shuffle([t.b, ...shuffle(pool).slice(0,3)]), resp:t.b, exp:`${tLab(t)} = ${t.b}. ${t.u}`};
+}
+function qEscribir(verbs, tenses){
+  const v=pick(verbs), t=TI[pick(tenses)], p=rnd(6), f=conj(v,t.id)[p];
+  const resp = uniq([f, formaSe(f)]);
+  const r = conjReg(v,t.id)[p];
+  let exp = t.aux ? `haber (${TI[t.aux].n.toLowerCase()}) + participio: «${f}».` : `${tLab(t)} de ${v.inf}: «${f}».`;
+  if(r!==f) exp += ` Ojo: no se dice «${r}».`;
+  if(resp.length>1) exp += ` También vale «${resp[1]}».`;
+  return {tipo:'escribir', tema:'Conjugar', enun:`Conjuga el verbo «${v.inf}»`, sub:`${tLab(t)} · ${PERS[p].pr} (${PERS[p].lab})`, resp, exp};
+}
+function irrTiempos(v, set){ return set.filter(id=>{const a=conj(v,id), b=conjReg(v,id); return a.some((x,i)=>x!==b[i]);}); }
+function elegirIrr(set){
+  let v, ts, n=0;
+  do { v=pick(IRR); ts=irrTiempos(v,set); } while(!ts.length && ++n<60);
+  const tid=pick(ts), a=conj(v,tid), b=conjReg(v,tid);
+  const p = pick([0,1,2,3,4,5].filter(i=>a[i]!==b[i]));
+  return {v, t:TI[tid], p, ok:a[p], mal:b[p]};
+}
+function cambiaTilde(f){
+  const w=f.split(' '), last=w.length-1;
+  if(/[áéíóú]/.test(w[last])) w[last]=sinTilde(w[last]);
+  else w[last]=w[last].replace(/([aeiou])([^aeiou]*)$/, (m,vw,rest)=>({a:'á',e:'é',i:'í',o:'ó',u:'ú'})[vw]+rest);
+  return w.join(' ');
+}
+function qIrrTest(set){
+  const {v,t,p,ok,mal} = elegirIrr(set);
+  let c = [mal, cambiaTilde(ok), cambiaTilde(mal)];
+  set.forEach(id=>{ if(id!==t.id) c.push(conj(v,id)[p]); });
+  c = shuffle(uniq(c.filter(x=>x!==ok)));
+  const m = [mal, ...c.filter(x=>x!==mal)].slice(0,3);
+  return {tipo:'test', tema:'Verbos irregulares', enun:'¿Cuál es la forma correcta?', sub:`${v.inf.toUpperCase()} · ${tLab(t)} · ${PERS[p].pr}`,
+    opciones: shuffle([ok, ...m]), resp:ok, exp:`Se dice «${ok}». «${mal}» sería la forma regular, pero «${v.inf}» es irregular en este tiempo.`};
+}
+function qIrrEscribir(set){
+  const {v,t,p,ok,mal} = elegirIrr(set);
+  return {tipo:'escribir', tema:'Verbos irregulares', enun:`Conjuga el verbo irregular «${v.inf}»`, sub:`${tLab(t)} · ${PERS[p].pr} (${PERS[p].lab})`,
+    resp: uniq([ok, formaSe(ok)]), exp:`Se dice «${ok}», no «${mal}».`};
+}
+function qPart(escribir){
+  const v=pick(PARTX), mal=partReg(v.inf);
+  if(escribir) return {tipo:'escribir', tema:'Participios irregulares', enun:`Escribe el participio de «${v.inf}»`, sub:'Piensa en: «he …»', resp:[v.part], exp:`Se dice «he ${v.part}», no «he ${mal}».`};
+  const op = uniq([v.part, mal, gerReg(v.inf), (VERBO[v.inf]?conj(VERBO[v.inf],'pps')[0]:reg(v.inf,'pps')[0])]);
+  return {tipo:'test', tema:'Participios irregulares', enun:`¿Cuál es el participio de «${v.inf}»?`, sub:'Es la forma que va detrás de haber', opciones:shuffle(op), resp:v.part,
+    exp:`El participio de ${v.inf} es irregular: «${v.part}» (he ${v.part}). Los regulares acaban en -ado / -ido.`};
+}
+
+/* ============ DETERMINANTES ============ */
+const DT = {art:'Artículo', dem:'Demostrativo', pos:'Posesivo', num:'Numeral cardinal', ind:'Indefinido', int:'Interrogativo', exc:'Exclamativo'};
+const DT_EXP = {
+  art:'Artículos: determinados (el, la, los, las) si el nombre se refiere a algo conocido; indeterminados (un, una, unos, unas) si se refiere a algo desconocido.',
+  dem:'Los demostrativos indican la distancia entre quien habla y el nombre: este (cercanía), ese (distancia media), aquel (lejanía).',
+  pos:'Los posesivos señalan a quién pertenece algo. Un poseedor: mi, tu, su, mis, tus, sus. Varios poseedores: nuestro, vuestro, su, nuestros, vuestros, sus.',
+  num:'Los numerales cardinales indican una cantidad exacta: tres, cien, veintiuno.',
+  ind:'Los indefinidos (algún, ningún, varios, muchos, otro, cada, todos…) indican cantidad de forma imprecisa.',
+  int:'Los interrogativos (qué, cuánto, cuántos…) aparecen en preguntas y llevan tilde.',
+  exc:'Los exclamativos (qué, cuánto, cuántos…) aparecen en exclamaciones y llevan tilde.',
+};
+const DETS_SRC = [
+ '{Mi|pos} hermano tiene {tres|num} gatos negros.', '{Aquella|dem} montaña está nevada.', '{El|art} perro de {mis|pos} vecinos ladra mucho.',
+ '¿{Qué|int} libro estás leyendo?', '¡{Qué|exc} día tan bonito!', '{Algunos|ind} alumnos llegaron tarde.', '{Este|dem} bocadillo está riquísimo.',
+ '{Esos|dem} zapatos son de {tu|pos} prima.', 'Llegaron {veinte|num} corredores a {la|art} meta.', '{Un|art} pájaro se posó en {la|art} ventana.',
+ 'No queda {ningún|ind} caramelo en {la|art} bolsa.', '{Varios|ind} amigos vinieron a {nuestra|pos} fiesta.', '¿{Cuántos|int} años tiene {tu|pos} abuela?',
+ '¡{Cuánta|exc} gente hay en {la|art} playa!', '{Cada|ind} niño trajo {una|art} fruta.', '{Vuestro|pos} equipo ganó {el|art} partido.',
+ 'Leí {cinco|num} capítulos en {dos|num} días.', '{Aquel|dem} castillo tiene {cien|num} años.', '{Otra|ind} vez se me olvidó {la|art} mochila.',
+ '{Su|pos} casa está al final de {esta|dem} calle.', '¿{Qué|int} película prefieres?', '{Muchas|ind} personas visitan {este|dem} museo.',
+ 'Vivo en {un|art} piso con {cuatro|num} ventanas.', '{Unos|art} turistas preguntaron por {la|art} catedral.', '{Bastantes|ind} niños prefieren {el|art} verano.',
+ '¡{Qué|exc} susto me diste!', '{Nuestros|pos} abuelos viven en {aquel|dem} pueblo.', '{Ese|dem} cuaderno fue {el|art} regalo de {mi|pos} tía.',
+ 'Compramos {doce|num} huevos para {la|art} tarta.', '¿{Cuántas|int} preguntas tiene {el|art} examen?', '{Todos|ind} {los|art} alumnos aprobaron.',
+ '{Mis|pos} padres compraron {un|art} coche nuevo.', '¡{Cuántos|exc} regalos hay debajo de {ese|dem} árbol!', '{Aquellas|dem} nubes traen lluvia.',
+ '{Pocos|ind} jugadores marcaron {dos|num} goles.', '{Esas|dem} flores son {mis|pos} favoritas.',
+];
+function subtipo(tk){
+  const w = tk.t.toLowerCase();
+  if(tk.d==='dem') return w.startsWith('aquel')||w.startsWith('aquell') ? 'lejanía' : w.startsWith('est') ? 'cercanía' : 'distancia media';
+  if(tk.d==='art') return /^(el|la|los|las)$/.test(w) ? 'determinado' : 'indeterminado';
+}
+const SUBT = {dem:['cercanía','distancia media','lejanía'], art:['determinado','indeterminado']};
+
+/* ============ ADJETIVOS ============ */
+const ADJ_SRC = [
+ 'El cielo [azul:ms:azul] brillaba sobre el mar [tranquilo:ms:tranquilo].', 'Mi abuela prepara unas galletas [deliciosas:fp:delicioso].',
+ 'Tengo un perro [pequeño:ms:pequeño] y [juguetón:ms:juguetón].', 'La película fue [aburrida:fs:aburrido].', 'Encontramos una cueva [oscura:fs:oscuro] y [húmeda:fs:húmedo].',
+ 'Los alumnos [nuevos:mp:nuevo] son muy [simpáticos:mp:simpático].', 'Ese edificio [antiguo:ms:antiguo] tiene ventanas [enormes:fp:enorme].',
+ 'Llevaba una camiseta [roja:fs:rojo] y unos pantalones [cortos:mp:corto].', 'El examen era [difícil:ms:difícil].', 'Mi hermana es [alta:fs:alto] y [rubia:fs:rubio].',
+ 'Compré unas zapatillas [cómodas:fp:cómodo].', 'El gato [negro:ms:negro] duerme en el sofá.', 'Hoy hace un día [soleado:ms:soleado].',
+ 'Las flores [amarillas:fp:amarillo] huelen muy bien.', 'Los caminos [estrechos:mp:estrecho] suben a la montaña.', 'Nos sirvieron una sopa [caliente:fs:caliente].',
+ 'Las niñas [valientes:fp:valiente] cruzaron el río [helado:ms:helado].', 'Escribió un cuento [divertido:ms:divertido].',
+];
+const GN = {ms:'Masculino singular', fs:'Femenino singular', mp:'Masculino plural', fp:'Femenino plural'};
+function formasAdj(lema){ if(!lema.endsWith('o')) return null; const r=lema.slice(0,-1); return {ms:lema, fs:r+'a', mp:r+'os', fp:r+'as'}; }
+const GR = {pos:'Positivo', csup:'Comparativo de superioridad', cigu:'Comparativo de igualdad', cinf:'Comparativo de inferioridad', srel:'Superlativo relativo', sabs:'Superlativo absoluto'};
+const GR_EXP = {
+  pos:'Grado positivo: expresa la cualidad sin compararla ni intensificarla.',
+  csup:'Comparativo de superioridad: más… que (también mejor, peor, mayor, menor).',
+  cigu:'Comparativo de igualdad: tan… como / igual de… que.',
+  cinf:'Comparativo de inferioridad: menos… que.',
+  srel:'Superlativo relativo: el/la más (o menos)… de: destaca dentro de un grupo.',
+  sabs:'Superlativo absoluto: muy + adjetivo o terminación -ísimo, sin comparar con nada.',
+};
+const GRADOS = [
+ ['Marta es [tan rápida como] su hermano.','cigu'], ['Este problema es [más difícil que] el anterior.','csup'], ['Mi mochila es [menos pesada que] la tuya.','cinf'],
+ ['Es [el alumno más alto] de la clase.','srel'], ['La sopa está [buenísima].','sabs'], ['El mar está [muy tranquilo].','sabs'], ['Tu dibujo es [precioso].','pos'],
+ ['El Everest es [la montaña más alta] del mundo.','srel'], ['Este helado es [mejor que] aquel.','csup'], ['El ruido era [extremadamente molesto].','sabs'],
+ ['Mi casa es [igual de grande que] la tuya.','cigu'], ['Hoy estoy [menos cansado que] ayer.','cinf'], ['Ese chiste es [malísimo].','sabs'],
+ ['Es [la peor película] que he visto.','srel'], ['La tarta es [dulce].','pos'], ['Luis es [mayor que] yo.','csup'], ['Este es [el ejercicio menos complicado] del libro.','srel'],
+ ['El agua está [fresquísima].','sabs'], ['Tu bici es [tan nueva como] la mía.','cigu'], ['El río es [ancho].','pos'], ['Mi abuelo es [más sabio que] un búho.','csup'],
+ ['Esta calle es [menos ruidosa que] la mía.','cinf'], ['La noche estaba [oscura].','pos'], ['Mi perro es [el más listo] del barrio.','srel'],
+];
+const SUPER = [['rico',['riquísimo']],['largo',['larguísimo']],['feliz',['felicísimo']],['fácil',['facilísimo']],['alto',['altísimo']],['guapo',['guapísimo']],
+ ['amable',['amabilísimo']],['fuerte',['fortísimo','fuertísimo']],['joven',['jovencísimo']],['cansado',['cansadísimo']],['blanco',['blanquísimo']],
+ ['simpático',['simpatiquísimo']],['limpio',['limpísimo','limpiísimo']],['antiguo',['antiquísimo','antigüísimo']],['fiel',['fidelísimo','fielísimo']],
+ ['pobre',['paupérrimo','pobrísimo']],['grande',['grandísimo']],['bueno',['buenísimo','bonísimo']],['difícil',['dificilísimo']],['caliente',['calentísimo']]];
+const CULTOS = [
+  {b:'bueno', comp:'mejor', sup:'óptimo'}, {b:'malo', comp:'peor', sup:'pésimo'}, {b:'grande', comp:'mayor', sup:'máximo'}, {b:'pequeño', comp:'menor', sup:'mínimo'},
+];
+
+/* ---- parser de frases ---- */
+function parse(s){
+  const out=[], re=/\{([^|}]+)\|([^}]+)\}|\[([^\]:]+):([^\]:]+):([^\]]+)\]|\[([^\]]+)\]|(\s+)|([\p{L}]+)|([^\s\p{L}{[]+)/gu;
+  let m; while((m=re.exec(s))){
+    if(m[1]) out.push({t:m[1], d:m[2]});
+    else if(m[3]) out.push({t:m[3], adj:true, gn:m[4], lema:m[5]});
+    else if(m[6]) out.push({t:m[6], grupo:true});
+    else if(m[7]) out.push({sp:true});
+    else if(m[8]) out.push({t:m[8]});
+    else out.push({t:m[9], pu:true});
+  }
+  return out;
+}
+const DETS = DETS_SRC.map(parse), ADJS = ADJ_SRC.map(parse);
+const fraseHTML = (toks, idx) => toks.map((k,i)=> k.sp ? ' ' : (i===idx||k.grupo) ? `<mark>${esc(k.t)}</mark>` : esc(k.t)).join('');
+
+function elegirDet(tipos){
+  const cand=[]; DETS.forEach((s,si)=>s.forEach((k,ki)=>{ if(k.d && tipos.includes(k.d)) cand.push([si,ki]); }));
+  const [si,ki]=pick(cand); return {s:DETS[si], i:ki, k:DETS[si][ki]};
+}
+function qDetClase(tipos){
+  const {s,i,k}=elegirDet(tipos);
+  const otros = shuffle(Object.keys(DT).filter(x=>x!==k.d && (tipos.length>3 ? tipos.includes(x) : true))).slice(0,3);
+  return {tipo:'test', tema:'Determinantes', enun:'¿Qué clase de determinante es la palabra marcada?', frase:fraseHTML(s,i),
+    opciones: shuffle([k.d,...otros]).map(x=>DT[x]), resp:DT[k.d], exp:`«${k.t}» es ${DT[k.d].toLowerCase()}. ${DT_EXP[k.d]}`};
+}
+function qDetSub(){
+  const {s,i,k}=elegirDet(['dem','art']); const st=subtipo(k);
+  const preg = {dem:'¿Qué distancia indica este demostrativo?', art:'¿Qué tipo de artículo es?'}[k.d];
+  const exp = {dem:'este/esta = cercanía · ese/esa = distancia media · aquel/aquella = lejanía.', art:'Determinados (algo conocido): el, la, los, las. Indeterminados (algo desconocido): un, una, unos, unas.'}[k.d];
+  return {tipo:'test', tema:'Determinantes', enun:preg, frase:fraseHTML(s,i), opciones:SUBT[k.d].map(x=>x[0].toUpperCase()+x.slice(1)), resp:st[0].toUpperCase()+st.slice(1), exp:`«${k.t}»: ${st}. ${exp}`};
+}
+function qDetTocar(tipos){
+  const {s,k}=elegirDet(tipos);
+  return {tipo:'tocar', tema:'Determinantes', enun:`Toca el determinante ${DT[k.d].toLowerCase()}`, toks:s.map(x=>({t:x.t, sp:x.sp, pu:x.pu, ok:x.d===k.d})),
+    exp:DT_EXP[k.d]};
+}
+function qDetVF(tipos){
+  const {s,i,k}=elegirDet(tipos); const verdad=Math.random()<.5;
+  const dice = verdad ? k.d : pick(tipos.filter(x=>x!==k.d));
+  return {tipo:'vf', tema:'Determinantes', enun:`La palabra marcada es un determinante ${DT[dice].toLowerCase()}.`, frase:fraseHTML(s,i), resp:verdad, exp:`«${k.t}» es ${DT[k.d].toLowerCase()}. ${DT_EXP[k.d]}`};
+}
+function qAdjTocar(){
+  const s=pick(ADJS);
+  return {tipo:'tocar', tema:'Adjetivos', enun:'Toca un adjetivo calificativo', sub:'Dice cómo es el sustantivo', toks:s.map(x=>({t:x.t, sp:x.sp, pu:x.pu, ok:!!x.adj})),
+    exp:`Adjetivos de la frase: ${s.filter(x=>x.adj).map(x=>'«'+x.t+'»').join(', ')}. El adjetivo acompaña al sustantivo y dice cómo es.`};
+}
+function adjConForma(){ const c=[]; ADJS.forEach((s,si)=>s.forEach((k,ki)=>{ if(k.adj && formasAdj(k.lema)) c.push([si,ki]); })); const [si,ki]=pick(c); return {s:ADJS[si], i:ki, k:ADJS[si][ki]}; }
+function qAdjConc(){
+  const {s,i,k}=adjConForma(), f=formasAdj(k.lema);
+  const frase = s.map((x,j)=> x.sp?' ': j===i ? '<mark>______</mark>' : esc(x.t)).join('');
+  return {tipo:'test', tema:'Concordancia', enun:`Completa con la forma correcta de «${k.lema}»`, frase, opciones:shuffle(Object.values(f)), resp:k.t,
+    exp:`El adjetivo concuerda en género y número con el sustantivo: ${GN[k.gn].toLowerCase()} → «${k.t}».`};
+}
+function qAdjGN(){
+  const {s,i,k}=adjConForma();
+  return {tipo:'test', tema:'Concordancia', enun:'¿Qué género y número tiene el adjetivo marcado?', frase:fraseHTML(s,i), opciones:Object.values(GN), resp:GN[k.gn],
+    exp:`«${k.t}» es ${GN[k.gn].toLowerCase()}, igual que el sustantivo al que acompaña.`};
+}
+function qGrado(ids){
+  const g = pick(GRADOS.filter(x=>ids.includes(x[1])));
+  const toks = parse(g[0]);
+  const otros = shuffle(Object.keys(GR).filter(x=>x!==g[1])).slice(0,3);
+  return {tipo:'test', tema:'Grados del adjetivo', enun:'¿En qué grado está el adjetivo?', frase:fraseHTML(toks,-1), opciones:shuffle([g[1],...otros]).map(x=>GR[x]), resp:GR[g[1]], exp:GR_EXP[g[1]]};
+}
+function qSuper(){
+  const [b,r]=pick(SUPER);
+  return {tipo:'escribir', tema:'Superlativo absoluto', enun:`Escribe el superlativo absoluto de «${b}»`, sub:'Termina en -ísimo (u otra forma)', resp:r,
+    exp:`${b} → ${r.join(' / ')}. Fíjate en los cambios: rico → riquísimo, feliz → felicísimo, joven → jovencísimo.`};
+}
+function qCulto(){
+  const c=pick(CULTOS), comp=Math.random()<.5;
+  const resp = comp ? c.comp : c.sup;
+  return {tipo:'test', tema:'Comparativos y superlativos cultos', enun: comp ? `Comparativo de superioridad de «${c.b}» en una sola palabra` : `Superlativo culto de «${c.b}»`,
+    opciones: shuffle(CULTOS.map(x=>comp?x.comp:x.sup)), resp, exp:`${c.b}: comparativo «${c.comp}», superlativo «${c.sup}».`};
+}
+
+
+/* ---- raíz, desinencia y conjugación ---- */
+function qRaiz(){
+  let v,t,f,r; do { v=pick(REG_SIMPLE); t=TI[pick(IND_S)]; f=conj(v,t.id)[rnd(6)]; r=v.inf.slice(0,-2); } while(f.length < r.length+3);
+  const ok = r+'-'+f.slice(r.length);
+  const malas = [r.length-1, r.length+1, r.length+2].filter(n=>n>1 && n<f.length).map(n=>f.slice(0,n)+'-'+f.slice(n));
+  return {tipo:'test', tema:'Raíz y desinencia', enun:`¿Cómo se separan la raíz y la desinencia de «${f}»?`, sub:`Verbo ${v.inf}`, opciones:shuffle(uniq([ok,...malas])), resp:ok,
+    exp:`La raíz se obtiene quitando -ar, -er o -ir al infinitivo: ${r}-${v.inf.slice(-2)}. La desinencia «-${f.slice(r.length)}» indica persona, número, tiempo y modo.`};
+}
+function qConjugacion(){
+  const v=pick([...REG,...IRR]), g=grupo(v.inf);
+  const op=['1ª conjugación (-ar)','2ª conjugación (-er)','3ª conjugación (-ir)'];
+  const conForma = Math.random()<.5 && v.inf!=='ir';
+  const f = conForma ? conj(v,pick(IND_S))[rnd(6)] : v.inf;
+  return {tipo:'test', tema:'Conjugaciones', enun:`¿A qué conjugación pertenece ${conForma?`«${f}»`:`el verbo «${f}»`}?`, sub:conForma?'Piensa en su infinitivo':'', opciones:op, resp:op[g],
+    exp:`${conForma?`«${f}» es del verbo ${v.inf}. `:''}Los verbos en -ar son de la 1ª conjugación, en -er de la 2ª y en -ir de la 3ª.`};
+}
+
+/* ============ PRONOMBRES ============ */
+const PRON = [ // palabra, persona, número (s/p/-), tónico/átono
+ ['yo',1,'s','t'],['mí',1,'s','t'],['conmigo',1,'s','t'],['tú',2,'s','t'],['usted',2,'s','t'],['ti',2,'s','t'],['contigo',2,'s','t'],['él',3,'s','t'],['ella',3,'s','t'],
+ ['me',1,'s','a'],['te',2,'s','a'],['lo',3,'s','a'],['la',3,'s','a'],['le',3,'s','a'],
+ ['nosotros',1,'p','t'],['nosotras',1,'p','t'],['vosotros',2,'p','t'],['vosotras',2,'p','t'],['ustedes',2,'p','t'],['ellos',3,'p','t'],['ellas',3,'p','t'],
+ ['nos',1,'p','a'],['os',2,'p','a'],['los',3,'p','a'],['las',3,'p','a'],['les',3,'p','a'],['se',3,'-','a'],['sí',3,'-','t'],['consigo',3,'-','t'],
+];
+const PN_LAB = (p,n) => `${p}ª persona del ${n==='s'?'singular':'plural'}`;
+const TONO_EXP = 'Tónicos: pueden ir solos o detrás de una preposición (yo, mí, conmigo, nosotros, ellos…). Átonos: van siempre junto al verbo (me, te, se, lo, la, le, nos, os, los, las, les).';
+const PRON_SRC = ['{Nosotros|p} vamos al parque.','Mi abuela {nos|p} contó un cuento.','¿{Te|p} gusta el chocolate?','{Ellos|p} juegan al fútbol.','Ese regalo es para {ti|p}.',
+ 'Ana {lo|p} vio ayer.','Ven {conmigo|p} a la playa.','{Os|p} espero en la puerta.','{Ella|p} canta muy bien.','Pedro {les|p} dio las llaves.','Siempre pienso en {vosotros|p}.',
+ 'Mañana {me|p} compran una bici.','{Usted|p} tiene razón.','A {mí|p} me encanta leer.','{Ustedes|p} pueden pasar.'];
+const PRONS = PRON_SRC.map(parse);
+const DETPRON = [['Hablaremos de [eso] más tarde.','pron'],['Han llegado [cuatro].','pron'],['Había [varios] en la terraza.','pron'],['[Varios] niños jugaban en la terraza.','det'],
+ ['Compré [cuatro] manzanas.','det'],['[Esa] es mi casa.','pron'],['[Esa] casa es mía.','det'],['Quiero [aquel], el azul.','pron'],['[Algunos] llegaron pronto.','pron'],
+ ['[Algunos] alumnos llegaron pronto.','det'],['Me gusta [este] libro.','det'],['Prefiero [este].','pron'],['[Muchos] piensan lo mismo.','pron'],['Tengo [muchos] cromos.','det'],
+ ['Me comí [dos].','pron'],['Tengo [dos] hermanos.','det'],['[Aquellos] árboles son muy altos.','det'],['¿Me prestas [ese]?','pron'],['No queda [ninguno].','pron'],['No queda [ningún] caramelo.','det']];
+function qPronPN(){
+  const w=pick(PRON.filter(x=>x[2]!=='-')); const ok=PN_LAB(w[1],w[2]);
+  const todas=[1,2,3].flatMap(p=>['s','p'].map(n=>PN_LAB(p,n))).filter(x=>x!==ok);
+  return {tipo:'test', tema:'Pronombres personales', enun:`¿Qué persona y número es el pronombre «${w[0]}»?`, opciones:shuffle([ok,...shuffle(todas).slice(0,3)]), resp:ok,
+    exp:`«${w[0]}» es un pronombre personal ${w[3]==='t'?'tónico':'átono'} de ${ok}.`};
+}
+function qPronTono(){
+  const w=pick(PRON);
+  return {tipo:'test', tema:'Tónicos y átonos', enun:`El pronombre «${w[0]}», ¿es tónico o átono?`, opciones:['Tónico','Átono'], resp:w[3]==='t'?'Tónico':'Átono', exp:TONO_EXP};
+}
+function qPronTocar(){
+  const s=pick(PRONS);
+  return {tipo:'tocar', tema:'Pronombres personales', enun:'Toca el pronombre personal', sub:'Sustituye a un nombre o señala a las personas', toks:s.map(x=>({t:x.t, sp:x.sp, pu:x.pu, ok:x.d==='p'})),
+    exp:`El pronombre es «${s.find(x=>x.d==='p').t}». ${TONO_EXP}`};
+}
+function qDetPron(){
+  const [f,r]=pick(DETPRON);
+  return {tipo:'test', tema:'¿Determinante o pronombre?', enun:'La palabra marcada, ¿es determinante o pronombre?', frase:fraseHTML(parse(f),-1), opciones:['Determinante','Pronombre'], resp:r==='det'?'Determinante':'Pronombre',
+    exp:'Demostrativos, numerales cardinales e indefinidos pueden ser las dos cosas: si van delante de un nombre son determinantes (esa casa); si van solos, en lugar del nombre, son pronombres (esa es mi casa).'};
+}
+
+
+/* ============ IMPERATIVO Y FORMAS NO PERSONALES ============ */
+const IMP_P = [{k:'tu', pr:'tú', sp:1}, {k:'usted', pr:'usted', sp:2}, {k:'vos', pr:'vosotros/as', sp:4}, {k:'ustedes', pr:'ustedes', sp:5}];
+function imperativo(v){
+  const sp=conj(v,'spres');
+  return {tu: IMP_TU[v.inf] || simple(v,'pres')[2], usted: sp[2], vos: v.inf.slice(0,-1)+'d', ustedes: sp[5]};
+}
+const IMP_VERBOS = [...REG_SIMPLE, ...IRR.filter(v=>!['poder','caber','querer','saber'].includes(v.inf))];
+const IMP_IRR = IRR.filter(v=>IMP_TU[v.inf]);
+const IMP_EXP = 'Imperativo: tú → como el presente de él (canta); vosotros → infinitivo cambiando -r por -d (cantad); usted y ustedes → presente de subjuntivo (cante, canten).';
+function qImpEscribir(verbs){
+  const v=pick(verbs), P=pick(IMP_P), f=imperativo(v)[P.k];
+  return {tipo:'escribir', tema:'Imperativo', enun:`Da una orden con el verbo «${v.inf}»`, sub:`Imperativo · ${P.pr}`, resp:[f],
+    exp:`${P.pr}: «¡${f}!». ${IMP_TU[v.inf]&&P.k==='tu'?`Es irregular: no se dice «${simple(v,'pres')[2]}».`:IMP_EXP}`};
+}
+function qImpTest(verbs){
+  const v=pick(verbs), im=imperativo(v), P=pick(IMP_P), ok=im[P.k];
+  const c = uniq([v.inf, simple(v,'pres')[2], conj(v,'spres')[1], simple(v,'pres')[4], ...Object.values(im)]).filter(x=>x!==ok);
+  return {tipo:'test', tema:'Imperativo', enun:`¿Cuál es el imperativo de «${v.inf}» para ${P.pr}?`, opciones:shuffle([ok,...shuffle(c).slice(0,3)]), resp:ok,
+    exp:`Se dice «¡${ok}!». ${P.k==='vos'?`Ojo: el infinitivo «${v.inf}» no sirve para dar órdenes.`:IMP_EXP}`};
+}
+function qImpPersona(){
+  for(let k=0;k<30;k++){ const v=pick(IMP_VERBOS), im=imperativo(v), P=pick(IMP_P), f=im[P.k];
+    if(Object.values(im).filter(x=>x===f).length>1) continue;
+    return {tipo:'test', tema:'Imperativo', enun:`¿A quién va dirigida la orden «¡${f[0].toUpperCase()+f.slice(1)}!»?`, sub:`Verbo ${v.inf}`, opciones:IMP_P.map(x=>x.pr), resp:P.pr, exp:IMP_EXP}; }
+  return qImpTest(IMP_VERBOS);
+}
+function qImpNeg(){
+  const v=pick(REG_SIMPLE), P=pick([IMP_P[0], IMP_P[2]]), sp=conj(v,'spres'), im=imperativo(v);
+  const ok='No '+sp[P.sp]; const mal=['No '+im[P.k], 'No '+v.inf, 'No '+(P.k==='tu'?sp[4]:sp[1])];
+  return {tipo:'test', tema:'Orden negativa', enun:`Orden negativa con «${v.inf}» para ${P.pr}`, sub:'Prohibir algo: no + …', opciones:shuffle([ok,...mal]), resp:ok,
+    exp:`Las órdenes negativas se forman con no + presente de subjuntivo: «${ok}». Nunca «${mal[0]}» ni «${mal[1]}».`};
+}
+const GER_IRR = {decir:'diciendo', dormir:'durmiendo', pedir:'pidiendo', venir:'viniendo', oír:'oyendo', caer:'cayendo', traer:'trayendo', ir:'yendo', poder:'pudiendo'};
+const gerundio = v => GER_IRR[v.inf] || gerReg(v.inf);
+const FNP = ['Infinitivo','Gerundio','Participio','Infinitivo compuesto','Gerundio compuesto'];
+function qFNP(){
+  const v=pick([...REG, ...IRR.filter(x=>x.inf!=='ir')]), i=rnd(5);
+  const f=[v.inf, gerundio(v), part(v), 'haber '+part(v), 'habiendo '+part(v)][i];
+  return {tipo:'test', tema:'Formas no personales', enun:`¿Qué forma no personal es «${f}»?`, opciones:FNP, resp:FNP[i],
+    exp:`Formas no personales de ${v.inf}: infinitivo «${v.inf}», gerundio «${gerundio(v)}», participio «${part(v)}», infinitivo compuesto «haber ${part(v)}», gerundio compuesto «habiendo ${part(v)}». No indican persona ni número.`};
+}
+function qGerundio(){
+  const v=pick([...REG_SIMPLE, ...IRR.filter(x=>GER_IRR[x.inf])]);
+  return {tipo:'escribir', tema:'Formas no personales', enun:`Escribe el gerundio de «${v.inf}»`, sub:'Termina en -ando o -iendo', resp:[gerundio(v)],
+    exp:`Gerundio: «${gerundio(v)}». ${GER_IRR[v.inf]?'Es irregular.':'-ar → -ando; -er, -ir → -iendo.'}`};
+}
+
+/* ============ TEXTO HISTÓRICO ============ */
+const PARTES = ['Título','Introducción','Desarrollo','Conclusión'];
+const PARTES_EXP = {
+  'Título':'El título presenta la idea principal.',
+  'Introducción':'La introducción presenta los personajes, la causa del acontecimiento, el tiempo y el lugar.',
+  'Desarrollo':'En el desarrollo se narran los hechos que ocurrieron, ordenados cronológicamente.',
+  'Conclusión':'La conclusión presenta el final del suceso o las consecuencias que tuvo el hecho histórico.',
+};
+const TEXTOS = [
+ {t:'La llegada del ser humano a la Luna',
+  i:'En julio de 1969, tres astronautas estadounidenses, Neil Armstrong, Buzz Aldrin y Michael Collins, viajaron hacia la Luna en la misión Apolo 11. Estados Unidos quería ser el primer país en llegar allí.',
+  d:'Primero, el cohete Saturno V los lanzó al espacio desde Florida el 16 de julio. Cuatro días después, el módulo lunar Eagle se posó en la Luna. Más tarde, Armstrong bajó por la escalera y pisó la superficie lunar.',
+  c:'Los astronautas regresaron a la Tierra el 24 de julio. Aquel viaje demostró que el ser humano podía llegar a otros mundos.',
+  e:['El cohete despega desde Florida','El módulo lunar se posa en la Luna','Armstrong pisa la superficie lunar','Los astronautas regresan a la Tierra']},
+ {t:'La imprenta de Gutenberg',
+  i:'A mediados del siglo XV, en la ciudad alemana de Maguncia, un orfebre llamado Johannes Gutenberg buscaba una forma de copiar libros más rápido. Hasta entonces, los libros se copiaban a mano y eran muy caros.',
+  d:'Primero, Gutenberg fabricó letras de metal que se podían mover y combinar. Después, adaptó una prensa parecida a las que se usaban para hacer vino. Hacia 1455, terminó de imprimir su famosa Biblia.',
+  c:'Desde entonces, los libros fueron más baratos y llegaron a muchas más personas. La imprenta cambió para siempre la forma de transmitir el conocimiento.',
+  e:['Los libros se copian a mano','Gutenberg fabrica letras de metal móviles','Gutenberg adapta una prensa','Termina de imprimir la Biblia']},
+ {t:'El primer viaje de Colón',
+  i:'En 1492, el navegante Cristóbal Colón, con el apoyo de los Reyes Católicos, quería llegar a Asia navegando hacia el oeste.',
+  d:'El 3 de agosto partió del puerto de Palos con tres barcos: la Pinta, la Niña y la Santa María. Después de más de dos meses de travesía, el 12 de octubre llegaron a una isla de las Bahamas. Más tarde, recorrieron Cuba y La Española.',
+  c:'En marzo de 1493, Colón regresó a España. Su viaje puso en contacto Europa y América, aunque él creyó hasta el final que había llegado a Asia.',
+  e:['Las carabelas salen del puerto de Palos','Llegan a una isla de las Bahamas','Recorren Cuba y La Española','Colón regresa a España']},
+ {t:'La Alhambra de Granada',
+  i:'En el siglo XIII, Muhammad I, primer rey nazarí de Granada, decidió construir una fortaleza sobre la colina de la Sabika.',
+  d:'Primero se levantaron las murallas y las torres de la Alcazaba. Más tarde, en el siglo XIV, los reyes Yusuf I y Muhammad V construyeron los palacios, como el Patio de los Leones. En 1492, los Reyes Católicos conquistaron Granada y se instalaron en la Alhambra.',
+  c:'Hoy la Alhambra es uno de los monumentos más visitados de España. En 1984 fue declarada Patrimonio de la Humanidad.',
+  e:['Se levanta la Alcazaba','Se construye el Patio de los Leones','Los Reyes Católicos conquistan Granada','Es declarada Patrimonio de la Humanidad']},
+ {t:'Los primeros Juegos Olímpicos modernos',
+  i:'A finales del siglo XIX, el francés Pierre de Coubertin quiso recuperar los antiguos Juegos Olímpicos de Grecia para unir a los pueblos mediante el deporte.',
+  d:'En 1894, organizó un congreso en París donde se fundó el Comité Olímpico Internacional. Dos años después, en abril de 1896, se inauguraron los primeros Juegos modernos en Atenas. Allí compitieron deportistas de catorce países.',
+  c:'Desde entonces, los Juegos se celebran cada cuatro años y hoy participan deportistas de todo el mundo.',
+  e:['Coubertin quiere recuperar los Juegos','Se funda el Comité Olímpico Internacional','Se inauguran los Juegos en Atenas','Los Juegos se celebran cada cuatro años']},
+];
+const CONECT_SRC = ['{Primero|c}, Gutenberg fabricó letras de metal.','{Después|c}, adaptó una prensa de vino.','{Más tarde|c}, Armstrong pisó la Luna.',
+ '{Cuatro días después|c}, el módulo se posó en la Luna.','{Hasta entonces|c}, los libros se copiaban a mano.','{Desde entonces|c}, los libros fueron más baratos.',
+ 'Colón partió de Palos y, {más tarde|c}, llegó a las Bahamas.','{Antes|c} de la imprenta, los libros eran muy caros.','{Al final|c}, los Reyes Católicos conquistaron Granada.',
+ '{Dos años después|c}, se inauguraron los Juegos en Atenas.','{Luego|c}, recorrieron Cuba y La Española.','{Finalmente|c}, los astronautas regresaron a la Tierra.'];
+const CONECTS = CONECT_SRC.map(parse);
+const CON_T = ['Después','Más tarde','Luego','Primero','Finalmente','Al final','Antes'];
+const CON_NO = ['Porque','Pero','Aunque','Sin embargo','Además','Por ejemplo'];
+const HUECOS = ['___, Colón regresó a España.','Los astronautas aterrizaron y, ___, salieron del módulo.','___, Gutenberg probó su prensa con pocas hojas.','___, se construyeron los palacios.'];
+const TH_TIEMPOS = [
+ ['En 1492, Colón [llega] a América.','ph'],['El 20 de julio de 1969, Armstrong [pisa] la Luna.','ph'],['Hacia 1455, Gutenberg [imprime] la primera Biblia.','ph'],
+ ['En 1492, Colón [llegó] a América.','pps'],['Armstrong [pisó] la Luna en 1969.','pps'],['Los libros se [copiaban] a mano.','impf'],['Coubertin [quería] unir a los pueblos.','impf'],
+ ['En 1896 se [inauguran] los Juegos de Atenas.','ph'],['Los Reyes Católicos [conquistaron] Granada.','pps']];
+const TH_T_LAB = {ph:'Presente histórico', pps:'Pretérito perfecto simple', impf:'Pretérito imperfecto', fut:'Futuro simple'};
+const RASGOS = [
+ ['Los textos históricos cuentan hechos del pasado ordenados cronológicamente.',true],['En el desarrollo se narran los hechos en orden cronológico.',true],
+ ['Los textos históricos se escriben en futuro.',false],['Se pueden escribir en pasado o en presente histórico.',true],['Los conectores temporales sirven para organizar la información.',true],
+ ['Los textos históricos casi nunca incluyen fechas ni datos.',false],['La introducción cuenta el final del suceso.',false],['Suelen ir acompañados de mapas, imágenes u organizadores gráficos.',true],
+ ['La conclusión presenta el final o las consecuencias del hecho histórico.',true],['El título presenta la idea principal.',true],['Los hechos se cuentan de más moderno a más antiguo.',false],
+ ['El presente histórico usa el presente para contar hechos pasados.',true]];
+function qParte(){
+  const T=pick(TEXTOS), k=pick(['t','i','d','c']), lab={t:'Título',i:'Introducción',d:'Desarrollo',c:'Conclusión'}[k];
+  return {tipo:'test', tema:'Estructura', enun:'¿Qué parte del texto histórico es esta?', frase:esc(T[k]), opciones:PARTES, resp:lab, exp:PARTES_EXP[lab]};
+}
+function qParteFuncion(){
+  const lab=pick(PARTES), q=PARTES_EXP[lab].replace(/^(El título|La introducción|En el desarrollo|La conclusión) /,'');
+  const enun = {Título:'¿Qué parte presenta la idea principal?', Introducción:'¿Qué parte presenta los personajes, la causa, el tiempo y el lugar?', Desarrollo:'¿En qué parte se narran los hechos ordenados cronológicamente?', Conclusión:'¿Qué parte presenta el final o las consecuencias del hecho?'}[lab];
+  return {tipo:'test', tema:'Estructura', enun, opciones:PARTES, resp:lab, exp:PARTES_EXP[lab]};
+}
+function qRasgo(){ const [f,r]=pick(RASGOS); return {tipo:'vf', tema:'El texto histórico', enun:f, resp:r, exp:'Los textos históricos cuentan hechos del pasado de más antiguo a más moderno, con conectores temporales, datos y fechas, en pasado o en presente histórico.'}; }
+function qOrdenar(){
+  const T=pick(TEXTOS);
+  return {tipo:'ordenar', tema:'Orden cronológico', enun:'Toca los hechos en orden, del más antiguo al más moderno', sub:T.t, items:T.e, exp:`Orden correcto: ${T.e.map((x,i)=>(i+1)+'. '+x).join(' · ')}.`};
+}
+function qConector(){
+  const s=pick(CONECTS);
+  return {tipo:'tocar', tema:'Conectores temporales', enun:'Toca el conector temporal', toks:s.map(x=>({t:x.t, sp:x.sp, pu:x.pu, ok:x.d==='c'})),
+    exp:`El conector es «${s.find(x=>x.d==='c').t}». Los conectores temporales (primero, después, más tarde, hasta entonces…) ordenan los hechos en el tiempo.`};
+}
+function qHueco(){
+  const h=pick(HUECOS), ok=pick(CON_T), mal=shuffle(CON_NO).slice(0,3);
+  const op=[ok,...mal].map(x=> h.startsWith('___') ? x : x.toLowerCase());
+  return {tipo:'test', tema:'Conectores temporales', enun:'Completa con un conector temporal', frase:esc(h).replace('___','<mark>______</mark>'), opciones:shuffle(op), resp:op[0],
+    exp:`«${ok}» es un conector temporal: indica cuándo ocurre algo. ${mal.join(', ')} no son temporales.`};
+}
+function qTiempoHist(){
+  const [f,t]=pick(TH_TIEMPOS);
+  return {tipo:'test', tema:'Tiempos del texto histórico', enun:'¿En qué tiempo está el verbo marcado?', frase:fraseHTML(parse(f),-1), opciones:Object.values(TH_T_LAB), resp:TH_T_LAB[t],
+    exp: t==='ph' ? 'Es presente histórico: se usa el presente para contar un hecho pasado y hacerlo más vivo.' : `Es ${TH_T_LAB[t].toLowerCase()}. Los textos históricos se escriben en pasado o en presente histórico.`};
+}
+
+
+/* ============ RECURSOS LITERARIOS ============ */
+const REC = {
+  aliteracion:{n:'Aliteración', d:'Repetir un sonido o varios para producir una sensación sonora.'},
+  repeticion:{n:'Repetición', d:'Repetir palabras o expresiones para reforzar una idea o un sentimiento.'},
+  metafora:{n:'Metáfora', d:'Identificar dos elementos que tienen una semejanza (sin usar «como»).'},
+  comparacion:{n:'Comparación', d:'Comparar dos elementos que tienen algo en común, usando «como», «igual que», «parece»…'},
+  personificacion:{n:'Personificación', d:'Atribuir cualidades humanas a objetos, plantas o animales.'},
+  hiperbole:{n:'Hipérbole', d:'Exagerar una cualidad o un sentimiento.'},
+};
+const REC_EJ = [
+ ['aliteracion','El perro de San Roque no tiene rabo.'],['aliteracion','Tres tristes tigres tragaban trigo en un trigal.'],['aliteracion','Mi mamá me mima mucho.'],
+ ['aliteracion','El ruido con que rueda la ronca tempestad.'],['aliteracion','Bajo el ala aleve del leve abanico.'],['aliteracion','Susurran suaves sus sedas.'],
+ ['repeticion','Que en mayo me des abril y en abril me des mayo.'],['repeticion','Verde que te quiero verde.'],['repeticion','Agua, agua, agua: el campo pide agua.'],
+ ['repeticion','Corre, corre, que llegas tarde.'],['repeticion','Paz, paz, solo pedimos paz.'],['repeticion','Todo pasa y todo queda.'],
+ ['metafora','La vida es una fiesta de cumpleaños.'],['metafora','Tus dientes son perlas.'],['metafora','El sol es una moneda de oro en el cielo.'],
+ ['metafora','Sus cabellos de oro brillaban al sol.'],['metafora','La luna, plato de plata, iluminaba el camino.'],['metafora','El mar es un espejo azul.'],
+ ['comparacion','Tus ojos son como luceros brillantes.'],['comparacion','Era fuerte como un roble.'],['comparacion','Su piel era blanca como la nieve.'],
+ ['comparacion','Tus manos son suaves como la seda.'],['comparacion','El lago brillaba igual que un espejo.'],['comparacion','Sus dientes parecían perlas.'],
+ ['personificacion','El dinosaurio daba clases de piano.'],['personificacion','El viento silbaba una canción triste.'],['personificacion','La luna nos miraba desde el cielo.'],
+ ['personificacion','Los árboles bailaban con la brisa.'],['personificacion','El reloj se reía de mi prisa.'],['personificacion','Las flores lloraban por la falta de lluvia.'],
+ ['hiperbole','Estoy tan contenta que deslumbro al pasar.'],['hiperbole','Te lo he dicho un millón de veces.'],['hiperbole','Tengo tanta hambre que me comería un elefante.'],
+ ['hiperbole','Lloró ríos de lágrimas.'],['hiperbole','Esta mochila pesa una tonelada.'],['hiperbole','Hace un frío que congela hasta los pensamientos.'],
+];
+const recExp = k => `${REC[k].n}: ${REC[k].d.charAt(0).toLowerCase()+REC[k].d.slice(1)}`;
+function qRecDef(ks){
+  const k=pick(ks), otros=shuffle(Object.keys(REC).filter(x=>x!==k)).slice(0,3);
+  return {tipo:'test', tema:'Recursos literarios', enun:'¿Qué recurso literario consiste en…?', frase:esc(REC[k].d.charAt(0).toLowerCase()+REC[k].d.slice(1)), opciones:shuffle([k,...otros]).map(x=>REC[x].n), resp:REC[k].n, exp:recExp(k)};
+}
+function qRecEj(ks){
+  const [k,f]=pick(REC_EJ.filter(x=>ks.includes(x[0])));
+  const otros=shuffle(Object.keys(REC).filter(x=>x!==k && (ks.length>3?ks.includes(x):true))).slice(0,3);
+  return {tipo:'test', tema:'Recursos literarios', enun:'¿Qué recurso literario hay en esta frase?', frase:esc(f), opciones:shuffle([k,...otros]).map(x=>REC[x].n), resp:REC[k].n, exp:recExp(k)};
+}
+function qRecFrase(ks){
+  const k=pick(ks), ok=pick(REC_EJ.filter(x=>x[0]===k))[1];
+  const malas=shuffle(REC_EJ.filter(x=>x[0]!==k)).slice(0,3).map(x=>x[1]);
+  return {tipo:'test', tema:'Recursos literarios', enun:`¿Qué frase contiene una ${REC[k].n.toLowerCase()}?`, opciones:shuffle([ok,...malas]), resp:ok, exp:recExp(k)};
+}
+function qRecVF(ks){
+  const [k,f]=pick(REC_EJ.filter(x=>ks.includes(x[0]))), verdad=Math.random()<.5;
+  const dice = verdad ? k : pick(ks.filter(x=>x!==k));
+  return {tipo:'vf', tema:'Recursos literarios', enun:`En esta frase hay una ${REC[dice].n.toLowerCase()}.`, frase:esc(f), resp:verdad, exp:recExp(k)};
+}
+
+
+/* ============ ORTOGRAFÍA ============ */
+const COMPUESTAS = [['saca','puntas','sacapuntas'],['gira','sol','girasol'],['cien','pies','ciempiés'],['hidro','avión','hidroavión'],['balón','cesto','baloncesto'],
+ ['para','aguas','paraguas'],['saca','corchos','sacacorchos'],['abre','latas','abrelatas'],['pasa','tiempo','pasatiempo'],['tela','araña','telaraña'],
+ ['agrio','dulce','agridulce'],['boca','calle','bocacalle'],['lava','platos','lavaplatos'],['veinte','dos','veintidós'],
+ ['diez','y seis','dieciséis'],['rompe','cabezas','rompecabezas'],['cumple','años','cumpleaños'],['espanta','pájaros','espantapájaros'],['guarda','barros','guardabarros'],['quita','nieves','quitanieves'],['salva','vidas','salvavidas'],['porta','aviones','portaaviones']];
+const COMP_EXP = 'Las palabras compuestas se forman uniendo dos o más palabras simples y se acentúan siguiendo las reglas generales, como una sola palabra. A veces cambian al unirse: cien + pies → ciempiés.';
+function qCompEscribir(){
+  const [a,b,c]=pick(COMPUESTAS);
+  return {tipo:'escribir', tema:'Palabras compuestas', enun:`Une las palabras: ${a} + ${b}`, sub:'Escribe la palabra compuesta (¡ojo con la tilde!)', resp:[c], estricto:true, exp:`${a} + ${b} → ${c}. ${COMP_EXP}`};
+}
+function qCompTest(){
+  const [a,b,c]=pick(COMPUESTAS);
+  const mal = uniq([a+' '+b, sinTilde(a+b.replace(/ /g,'')), cambiaTilde(c), sinTilde(c), a+b.replace(/ /g,'')]).filter(x=>x!==c);
+  return {tipo:'test', tema:'Palabras compuestas', enun:`¿Cómo se escribe la palabra compuesta de «${a}» y «${b}»?`, opciones:shuffle([c,...shuffle(mal).slice(0,3)]), resp:c, exp:COMP_EXP};
+}
+function qCompPartes(){
+  const [a,b,c]=pick(COMPUESTAS);
+  const otras=shuffle(COMPUESTAS.filter(x=>x[2]!==c)).slice(0,3).map(x=>x[0]+' + '+x[1]);
+  return {tipo:'test', tema:'Palabras compuestas', enun:`¿Qué palabras simples forman «${c}»?`, opciones:shuffle([a+' + '+b,...otras]), resp:a+' + '+b, exp:COMP_EXP};
+}
+const MENTE = [['rápido','rápidamente'],['fácil','fácilmente'],['práctico','prácticamente'],['nuevo','nuevamente'],['cortés','cortésmente'],['ágil','ágilmente'],
+ ['último','últimamente'],['lento','lentamente'],['feliz','felizmente'],['tranquilo','tranquilamente'],['cómodo','cómodamente'],['difícil','difícilmente'],
+ ['alegre','alegremente'],['sincero','sinceramente'],['amable','amablemente'],['público','públicamente'],['claro','claramente'],['débil','débilmente'],
+ ['único','únicamente'],['cuidadoso','cuidadosamente'],['automático','automáticamente'],['fuerte','fuertemente']];
+const MENTE_EXP = 'Los adverbios en -mente se forman a partir del adjetivo (en femenino si lo tiene) y no siguen las reglas generales: si el adjetivo lleva tilde, el adverbio también (práctico → prácticamente); si no la lleva, tampoco (nuevo → nuevamente).';
+function qMenteEscribir(){
+  const [a,m]=pick(MENTE);
+  return {tipo:'escribir', tema:'Adverbios en -mente', enun:`Forma el adverbio en -mente de «${a}»`, sub:'¡Fíjate en si el adjetivo lleva tilde!', resp:[m], estricto:true, exp:`${a} → ${m}. ${MENTE_EXP}`};
+}
+function qMenteTest(){
+  const [a,m]=pick(MENTE);
+  const mal = uniq([cambiaTilde(m), a+'mente', sinTilde(m), m.replace(/^(.*?)([aeiou])/,(x,y,z)=>y+({a:'á',e:'é',i:'í',o:'ó',u:'ú'}[z]||z))]).filter(x=>x!==m);
+  return {tipo:'test', tema:'Adverbios en -mente', enun:`¿Cuál es el adverbio correcto de «${a}»?`, opciones:shuffle([m,...shuffle(mal).slice(0,3)]), resp:m, exp:MENTE_EXP};
+}
+const DIACR = {té:'sustantivo (bebida)', te:'pronombre personal', tú:'pronombre personal', tu:'determinante posesivo', dé:'verbo dar', de:'preposición',
+  sí:'pronombre personal o adverbio de afirmación', si:'condicional', sé:'verbo saber o verbo ser', se:'pronombre personal', mí:'pronombre personal', mi:'determinante posesivo',
+  él:'pronombre personal', el:'artículo', qué:'interrogativo o exclamativo', que:'sin sentido interrogativo', cuál:'interrogativo', cual:'sin sentido interrogativo',
+  quién:'interrogativo', quien:'sin sentido interrogativo', dónde:'interrogativo', donde:'sin sentido interrogativo', cuándo:'interrogativo', cuando:'sin sentido interrogativo',
+  cómo:'interrogativo', como:'sin sentido interrogativo', 'por qué':'interrogativo (pregunta)', porque:'explica la causa', cuánto:'exclamativo o interrogativo', cuanto:'sin sentido interrogativo'};
+const HUECOS_D = [['Por las mañanas tomo ___ negro.','té','te'],['___ he comprado batido de chocolate.','te','té'],['___ vas a clase de canto.','tú','tu'],['___ gato es muy gracioso.','tu','tú'],
+ ['Espero que se ___ prisa.','dé','de'],['El vecino ___ mi abuela es francés.','de','dé'],['Pau habla para ___ mismo.','sí','si'],['Le pregunté y me dijo que ___.','sí','si'],
+ ['___ quieres, vamos a merendar.','si','sí'],['No ___ dónde está.','sé','se'],['___ amable con ellos.','sé','se'],['___ lo conté cuando nos vimos.','se','sé'],
+ ['Este regalo es para ___.','mí','mi'],['___ hermano juega al baloncesto.','mi','mí'],['___ trajo la pelota.','él','el'],['___ perro ladra mucho.','el','él'],
+ ['¿___ pasa?','qué','que'],['Dice ___ vendrá mañana.','que','qué'],['¿___ es la calle?','cuál','cual'],['¿___ va?','quién','quien'],['Vivo ___ nació mi madre.','donde','dónde'],
+ ['¿___ está mi mochila?','dónde','donde'],['¡___ alegría!','qué','que'],['¿___ llegas?','cuándo','cuando'],['Te llamo ___ llegue.','cuando','cuándo'],
+ ['¿___ no viniste?','por qué','porque'],['No fui ___ estaba enfermo.','porque','por qué'],['¿___ se hace este pastel?','cómo','como'],['Come ___ un león.','como','cómo'],
+ ['¡___ ha crecido tu hermano!','cuánto','cuanto'],['¿Quieres ___ o café?','té','te'],['Si ___ quieres, ven.','tú','tu']];
+const mayus = (h,w) => h.startsWith('___') || /^[¿¡]___/.test(h) ? w[0].toUpperCase()+w.slice(1) : w;
+function qDiacr(){
+  const [h,ok,mal]=pick(HUECOS_D);
+  const o=[mayus(h,ok), mayus(h,mal)];
+  return {tipo:'test', tema:'Tilde diacrítica', enun:'Completa con la palabra correcta', frase:esc(h).replace('___','<mark>______</mark>'), opciones:shuffle(o), resp:o[0],
+    exp:`«${ok}»: ${DIACR[ok]}. «${mal}»: ${DIACR[mal]}. La tilde diacrítica distingue palabras que se escriben igual pero significan cosas distintas.`};
+}
+function qDiacrTipo(){
+  const pares=[['té','te'],['tú','tu'],['dé','de'],['sí','si'],['sé','se'],['mí','mi'],['él','el']], par=pick(pares), w=pick(par);
+  const op=uniq(par.map(x=>DIACR[x]).concat(shuffle(Object.values(DIACR).filter(x=>!x.includes('interrog') && !x.includes('causa'))))).slice(0,4);
+  return {tipo:'test', tema:'Tilde diacrítica', enun:`¿Qué clase de palabra es «${w}»?`, opciones:shuffle(op), resp:DIACR[w], exp:`${par[0]}: ${DIACR[par[0]]} · ${par[1]}: ${DIACR[par[1]]}.`};
+}
+const MONOS = [['dio','dió'],['fue','fué'],['pie','pié'],['vio','vió'],['fui','fuí'],['ti','tí'],['le','lé'],['pez','péz'],['sol','sól'],['vi','ví'],['mar','már'],['bien','bién']];
+function qMono(){
+  const [ok,mal]=pick(MONOS); const o=shuffle([ok,mal]);
+  return {tipo:'test', tema:'Monosílabos', enun:'¿Cuál está bien escrita?', opciones:o, resp:ok, exp:`Se escribe «${ok}». Por regla general, las palabras monosílabas no llevan tilde (le, dio, pie). Solo la llevan las de tilde diacrítica (té, tú, dé, sí, sé, mí, él).`};
+}
+
+
+/* ============ LETRAS: H, X/S, G/J ============ */
+const REGLAS = {
+  h1:['Empieza por hum-, horm- o horr-','Se escriben con h las palabras que empiezan por hum-, horm- y horr-: húmedo, hormilla, horrible.'],
+  h2:['Empieza por hie-, hue- o hui-','Se escriben con h las palabras que empiezan por hie-, hue-, hui- y sus derivados: hierro, hueso, huimos. Excepto las que empiezan por o: hueso → óseo.'],
+  h3:['Empieza por her-','Se escriben con h las palabras que empiezan por her-: hermano, hermoso. Excepto error, erguir, Ernesto y ermita.'],
+  h4:['Es de haber, hacer, hallar, hablar o habitar','Se escriben con h todas las formas de los verbos haber, hacer, hallar, hablar y habitar y sus derivados: hablamos, hablante, habladuría.'],
+  x1:['Empieza por ex- o extra-','Se escriben con x las palabras que empiezan por los prefijos ex- o extra-: exgerente, extraoficial.'],
+  x2:['Empieza por expla-, expli-, explo-, expre-, expri-, expro-','Se escriben con x las palabras que empiezan por expla-, expli-, explo-, expre-, expri-, expro-: explanada, explicar, explotar, expresión, exprimir, expropiar.'],
+  s1:['Sonido «s» delante de b, f, g, l, m, q','Se escriben con s las palabras que tienen el sonido «s» delante de b, f, g, l, m, q: esbozo, asfalto, musgo, aislar, asma, bosque. Excepto exquisito.'],
+  s2:['Termina en -ísimo, -ísima','Se escriben con s las palabras terminadas en -ísimo, -ísima: cerquísima, lejísimos.'],
+  s3:['Sustantivo terminado en -sión','Se escriben con s los sustantivos que terminan en -sión: adhesión, confusión. Excepto anexión, conexión, crucifixión, flexión y reflexión.'],
+  g1:['Verbo terminado en -ger o -gir','Se escriben con g los verbos que terminan en -ger y -gir: escoger, exigir. Excepto tejer y crujir.'],
+  g2:['Empieza por geo-, gest- o gen-','Se escriben con g las palabras que empiezan por geo-, gest- y gen-: geógrafo, gestión, gentío. Excepto jengibre.'],
+  g3:['Termina en -gen','Se escriben con g las palabras que terminan en -gen: margen, origen.'],
+  g4:['Termina en -gia, -gio, -gión, -gional','Se escriben con g las palabras que terminan en -gia, -gio, -gión y -gional: nostalgia, refugio, región, regional. Excepto lejía.'],
+  j1:['Verbo terminado en -jear','Se escriben con j los verbos que terminan en -jear: carcajear.'],
+  j2:['Infinitivo sin g ni j','Se escriben con j las formas verbales con sonido «j» cuyo infinitivo no lleva ni g ni j: conduje (conducir).'],
+  j3:['Termina en -jero, -jera, -jería','Se escriben con j las palabras que terminan en -jero, -jera, -jería: sonajero, extranjera, conserjería. Excepto ligero.'],
+  j4:['Termina en -aje','Se escriben con j las palabras que terminan en -aje: peaje, garaje.'],
+};
+const LETRAS_SRC = {
+ h1:'húmedo/úmedo humo/umo humilde/umilde humano/umano hormiga/ormiga hormigón/ormigón horrible/orrible horror/orror',
+ h2:'hielo/ielo hierba/ierba hierro/ierro huevo/uevo hueso/ueso huerto/uerto huella/uella huida/uida óseo/hóseo óvalo/hóvalo',
+ h3:'hermano/ermano hermoso/ermoso herida/erida herramienta/erramienta hervir/ervir herencia/erencia error/herror ermita/hermita erguir/herguir',
+ h4:'hablamos/ablamos habitante/abitante hallazgo/allazgo hicimos/icimos había/abía habladuría/abladuría hallé/allé habitación/abitación',
+ x1:'exgerente/esgerente extraoficial/estraoficial extraordinario/estraordinario extraterrestre/estraterrestre exalumno/esalumno expresidente/espresidente',
+ x2:'explanada/esplanada explicar/esplicar explotar/esplotar explorar/esplorar expresión/espresión exprimir/esprimir expropiar/espropiar',
+ s1:'esbozo/exbozo asfalto/axfalto musgo/muxgo esbelto/exbelto esfuerzo/exfuerzo esgrima/exgrima eslabón/exlabón esmeralda/exmeralda esquí/exquí esqueleto/exqueleto exquisito/esquisito',
+ s2:'cerquísima/cerquíxima lejísimos/lejíximos altísimo/altíximo rapidísimo/rapidíximo',
+ s3:'adhesión/adhexión confusión/confuxión televisión/televixión decisión/decixión anexión/anesión conexión/conesión crucifixión/crucifisión flexión/flesión reflexión/reflesión',
+ g1:'escoger/escojer exigir/exijir recoger/recojer proteger/protejer elegir/elejir dirigir/dirijir corregir/correjir tejer/teger crujir/crugir',
+ g2:'geógrafo/jeógrafo geometría/jeometría gestión/jestión gesto/jesto gentío/jentío gente/jente generoso/jeneroso jengibre/gengibre',
+ g3:'margen/marjen origen/orijen imagen/imajen virgen/virjen',
+ g4:'nostalgia/nostaljia magia/majia refugio/refujio colegio/colejio región/rejión religión/relijión regional/rejional lejía/legía',
+ j1:'carcajear/carcagear hojear/hogear callejear/callegear canjear/cangear',
+ j2:'conduje/conduge dije/dige traje/trage produjo/produgo tradujiste/tradugiste',
+ j3:'sonajero/sonagero extranjera/extrangera conserjería/consergería relojería/relogería cerrajero/cerragero pasajero/pasagero ligero/lijero',
+ j4:'peaje/peage garaje/garage viaje/viage paisaje/paisage equipaje/equipage aterrizaje/aterrizage',
+};
+const LETRAS = Object.entries(LETRAS_SRC).flatMap(([k,v])=>v.split(' ').map(x=>{const [ok,mal]=x.split('/'); return {ok,mal,k};}));
+const EXCEPCIONES = ['óseo','óvalo','error','ermita','erguir','exquisito','anexión','conexión','crucifixión','flexión','reflexión','tejer','crujir','jengibre','lejía','ligero'];
+function hueco(a,b){ let i=0; while(i<a.length && a[i]===b[i]) i++; let j=0; while(j<a.length-i && j<b.length-i && a[a.length-1-j]===b[b.length-1-j]) j++; return a.slice(0,i)+'_'+a.slice(a.length-j); }
+const expLetra = w => (EXCEPCIONES.includes(w.ok) ? `«${w.ok}» es una excepción. ` : '') + REGLAS[w.k][1];
+function qLetra(grupo){
+  const w=pick(LETRAS.filter(x=>grupo.includes(x.k[0])));
+  return {tipo:'test', tema:'Ortografía de letras', enun:'¿Cuál está bien escrita?', sub:`Completa: ${hueco(w.ok,w.mal)}`, opciones:shuffle([w.ok,w.mal]), resp:w.ok, exp:expLetra(w)};
+}
+function qLetraEscribir(grupo){
+  const w=pick(LETRAS.filter(x=>grupo.includes(x.k[0])));
+  return {tipo:'escribir', tema:'Ortografía de letras', enun:`Escribe la palabra completa: ${hueco(w.ok,w.mal)}`, sub:`Pista: ${w.ok.length} letras`, resp:[w.ok], estricto:true, exp:expLetra(w)};
+}
+function qLetraRegla(grupo){
+  const w=pick(LETRAS.filter(x=>grupo.includes(x.k[0]) && !EXCEPCIONES.includes(x.ok)));
+  const otras=shuffle(Object.keys(REGLAS).filter(k=>k!==w.k && grupo.includes(k[0]))).slice(0,3);
+  return {tipo:'test', tema:'Reglas ortográficas', enun:`¿Qué regla explica cómo se escribe «${w.ok}»?`, opciones:shuffle([w.k,...otras]).map(k=>REGLAS[k][0]), resp:REGLAS[w.k][0], exp:REGLAS[w.k][1]};
+}
+function qExcepcion(grupo){
+  const ex=pick(LETRAS.filter(x=>grupo.includes(x.k[0]) && EXCEPCIONES.includes(x.ok)));
+  const normales=shuffle(LETRAS.filter(x=>x.k===ex.k && !EXCEPCIONES.includes(x.ok))).slice(0,3).map(x=>x.ok);
+  return {tipo:'test', tema:'Excepciones', enun:'¿Cuál de estas palabras es una excepción a la regla?', opciones:shuffle([ex.ok,...normales]), resp:ex.ok, exp:expLetra(ex)};
+}
+
+
+/* ============ SIGNOS DE PUNTUACIÓN ============ */
+const SIG = {
+  pyc:{n:'Punto y coma (;)', re:/;/g, def:'Indica una pausa más larga que la coma y un poco más corta que el punto.'},
+  ps:{n:'Puntos suspensivos (...)', re:/\.\.\./g},
+  par:{n:'Paréntesis ( )', re:/[()]/g},
+  com:{n:'Comillas (“ ”)', re:/[“”]/g},
+  raya:{n:'Raya (—)', re:/—/g},
+};
+const USOS = {
+  pyc1:['pyc','Separar los elementos de una enumeración cuando ya hay alguna coma'],
+  pyc2:['pyc','Ir antes de «sin embargo», «en cambio» o «no obstante»'],
+  ps1:['ps','Indicar que una enumeración no está completa (como etc.)'],
+  ps2:['ps','Expresar sorpresa, misterio o suspense'],
+  par1:['par','Introducir aclaraciones'],
+  par2:['par','Introducir datos concretos (fechas, lugares…)'],
+  com1:['com','Reproducir las palabras de otra persona'],
+  com2:['com','Indicar que una palabra es extranjera o se usa con tono irónico'],
+  raya1:['raya','En diálogos, antes de la intervención de cada personaje'],
+  raya2:['raya','Marcar incisos'],
+};
+const SIG_EJ = [
+ ['pyc1','Juan quiere ir al cine; Carmen, a jugar a los bolos; y Alberto, al tenis.'],['pyc1','Mi hermano estudia Medicina; mi prima, Derecho; y yo, Historia.'],['pyc1','En verano iremos a la playa; en invierno, a la nieve.'],
+ ['pyc2','Íbamos a comer carne; sin embargo, vamos a comer marisco.'],['pyc2','Quería salir; no obstante, se quedó en casa.'],['pyc2','Ana prefiere el mar; en cambio, Luis prefiere la montaña.'],
+ ['ps1','Darío practica baloncesto, fútbol, tenis...'],['ps1','En la mochila llevo libros, cuadernos, lápices...'],['ps1','Compramos manzanas, peras, plátanos...'],
+ ['ps2','Entré en la habitación y... ¡los abuelos habían vuelto!'],['ps2','Abrí la caja y dentro había... ¡un gatito!'],['ps2','Se oyó un ruido en el desván y...'],
+ ['par1','Juan Pablo no puede comer nueces (es alérgico).'],['par1','Mi tía (la hermana de mi madre) vive en Sevilla.'],['par1','Llegamos tarde (el tren se retrasó).'],
+ ['par2','Paco de Lucía (1947-2014) fue un guitarrista de flamenco muy famoso.'],['par2','Cervantes (1547-1616) escribió el Quijote.'],['par2','Mis primos viven en Oporto (Portugal).'],
+ ['com1','Entonces me dijo: “si no limpias la habitación, no podrás ir a jugar con tus amigos”.'],['com1','Mi abuelo siempre dice: “quien madruga, Dios le ayuda”.'],['com1','La profesora dijo: “mañana hay examen”.'],
+ ['com2','El conductor no vio la señal de “stop” y dio un frenazo.'],['com2','Sí, claro, aquí hace “fresquito” en verano.'],['com2','Su “hobby” favorito es pintar.'],
+ ['raya1','—No quiero ir al cine. —Irás de todas formas.'],['raya1','—¿Vienes a jugar? —Ahora no puedo.'],['raya1','—¿Qué hora es? —Las cinco y media.'],
+ ['raya2','El próximo año —dijo el profesor— habrá tres alumnos nuevos en el aula.'],['raya2','Mi perro —que es muy listo— abre la puerta solo.'],['raya2','La excursión —según el director— será en mayo.'],
+];
+const usoExp = u => `${SIG[USOS[u][0]].n}: se usa para ${USOS[u][1].charAt(0).toLowerCase()+USOS[u][1].slice(1)}.`;
+const marcaSig = (f,k) => esc(f).replace(SIG[k].re, '<mark>$&</mark>');
+function qSignoUso(ks){
+  const [u,f]=pick(SIG_EJ.filter(x=>ks.includes(USOS[x[0]][0]))), k=USOS[u][0];
+  const otros=shuffle(Object.keys(USOS).filter(x=>x!==u && ks.includes(USOS[x][0]))).slice(0,3);
+  return {tipo:'test', tema:'Signos de puntuación', enun:`¿Para qué se usa aquí: ${SIG[k].n.toLowerCase()}?`, frase:marcaSig(f,k), opciones:shuffle([u,...otros]).map(x=>USOS[x][1]), resp:USOS[u][1], exp:usoExp(u)};
+}
+function qSignoFalta(ks){
+  const [u,f]=pick(SIG_EJ.filter(x=>ks.includes(USOS[x[0]][0]))), k=USOS[u][0];
+  const otros=shuffle(Object.keys(SIG).filter(x=>x!==k)).slice(0,3);
+  return {tipo:'test', tema:'Signos de puntuación', enun:'¿Qué signo falta en los huecos?', frase:esc(f).replace(SIG[k].re,'<mark>▢</mark>'), opciones:shuffle([k,...otros]).map(x=>SIG[x].n), resp:SIG[k].n, exp:usoExp(u)};
+}
+function qSignoDef(ks){
+  const u=pick(Object.keys(USOS).filter(x=>ks.includes(USOS[x][0]))), k=USOS[u][0];
+  const otros=shuffle(Object.keys(SIG).filter(x=>x!==k)).slice(0,3);
+  return {tipo:'test', tema:'Signos de puntuación', enun:'¿Qué signo se usa para…?', frase:esc(USOS[u][1].charAt(0).toLowerCase()+USOS[u][1].slice(1)), opciones:shuffle([k,...otros]).map(x=>SIG[x].n), resp:SIG[k].n, exp:usoExp(u)};
+}
+function qSignoVF(ks){
+  const [u,f]=pick(SIG_EJ.filter(x=>ks.includes(USOS[x[0]][0]))), k=USOS[u][0], verdad=Math.random()<.5;
+  const dice = verdad ? u : pick(Object.keys(USOS).filter(x=>x!==u && USOS[x][0]===k));
+  return {tipo:'vf', tema:'Signos de puntuación', enun:`Aquí ${SIG[k].n.split(' (')[0].toLowerCase()} sirve para ${USOS[dice][1].charAt(0).toLowerCase()+USOS[dice][1].slice(1)}.`, frase:marcaSig(f,k), resp:verdad, exp:usoExp(u)};
+}
+
+/* ============ MUNDOS Y NIVELES ============ */
+function mix(list){ const tot=list.reduce((a,x)=>a+x[0],0); let r=Math.random()*tot; for(const [w,f] of list){ if((r-=w)<0) return f(); } return list[0][1](); }
+const MUNDOS = [
+ {id:'tiempos', nombre:'Tiempos verbales', desc:'Simples, compuestos, indicativo y subjuntivo', col:'--c1', ico:'T', niveles:[
+   {n:'Tiempos simples', d:'Raíz y desinencia, conjugaciones y tiempos simples de indicativo', g:()=>mix([[4,()=>qIdent(IND_S,IND_S,REG_SIMPLE)],[2,()=>qEscribir(REG_SIMPLE,IND_S)],[2,()=>qPersona(REG_SIMPLE,IND_S)],[1,()=>qBello(IND_S)],[2,()=>qRaiz()],[1,()=>qConjugacion()]])},
+   {n:'Tiempos compuestos', d:'Haber + participio: antepresente, antecopretérito…', g:()=>mix([[4,()=>qIdent(IND_C,IND,REG)],[2,()=>qSimpleComp(REG,IND)],[3,()=>qEscribir(REG,IND_C)],[2,()=>qBello(IND_C)]])},
+   {n:'Modo subjuntivo', d:'Que yo cante, que yo haya cantado…', g:()=>mix([[4,()=>qIdent(SUB,ALLT,REG)],[2,()=>qModo(REG,ALLT)],[3,()=>qEscribir(REG,['spres','simpf','sppc','splus'])],[1,()=>qPersona(REG,SUB)],[1,()=>qBello(ALLT)]])},
+ ]},
+ {id:'irregulares', nombre:'Verbos irregulares', desc:'Tener, hacer, caber, andar, conducir…', col:'--c2', ico:'!', niveles:[
+   {n:'Presente y pasado', d:'Yo quepo, él anduvo, nosotros hicimos', g:()=>mix([[4,()=>qIrrTest(['pres','pps'])],[1,()=>qIrrEscribir(['pres','pps'])]])},
+   {n:'Futuro y participios', d:'Tendré, cabría, he puesto, he roto', g:()=>mix([[3,()=>qIrrTest(['pres','pps','fut','cond','impf'])],[2,()=>qIrrEscribir(['pres','pps','fut','cond'])],[2,()=>qPart(false)],[1,()=>qPart(true)]])},
+   {n:'Subjuntivo y compuestos', d:'Que yo quepa, si tuviera, habíamos dicho', g:()=>mix([[3,()=>qIrrTest(['spres','simpf','ppc','plus','futc','condc'])],[3,()=>qIrrEscribir(['spres','simpf','ppc','plus'])],[1,()=>qPart(true)]])},
+ ]},
+ {id:'determinantes', nombre:'Determinantes', desc:'Artículos, demostrativos, posesivos…', col:'--c3', ico:'D', niveles:[
+   {n:'Artículos, demostrativos y posesivos', d:'El, este, mi…', g:()=>mix([[4,()=>qDetClase(['art','dem','pos'])],[2,()=>qDetTocar(['art','dem','pos'])],[2,()=>qDetSub()]])},
+   {n:'Numerales e indefinidos', d:'Tres, cien, algunos, ningún…', g:()=>mix([[4,()=>qDetClase(['art','dem','pos','num','ind'])],[2,()=>qDetTocar(['num','ind','pos','dem'])],[1,()=>qDetSub()],[2,()=>qDetVF(['art','dem','pos','num','ind'])]])},
+   {n:'Todos los determinantes', d:'También interrogativos y exclamativos', g:()=>mix([[4,()=>qDetClase(Object.keys(DT))],[2,()=>qDetTocar(Object.keys(DT))],[2,()=>qDetVF(Object.keys(DT))],[1,()=>qDetSub()]])},
+ ]},
+ {id:'pronombres', nombre:'Pronombres', desc:'Personales, tónicos, átonos', col:'--c6', ico:'P', niveles:[
+   {n:'Pronombres personales', d:'Yo, tú, nosotros… persona y número', g:()=>mix([[3,()=>qPronTocar()],[3,()=>qPronPN()]])},
+   {n:'Tónicos y átonos', d:'Conmigo, ti, me, nos, les…', g:()=>mix([[3,()=>qPronTono()],[2,()=>qPronPN()],[1,()=>qPronTocar()]])},
+   {n:'¿Determinante o pronombre?', d:'Esa casa / esa es mi casa', g:()=>mix([[5,()=>qDetPron()],[1,()=>qPronTono()]])},
+ ]},
+ {id:'adjetivos', nombre:'Adjetivos', desc:'Concordancia y grados', col:'--c4', ico:'A', niveles:[
+   {n:'Encuentra el adjetivo', d:'Qué es y cómo concuerda', g:()=>mix([[3,()=>qAdjTocar()],[2,()=>qAdjConc()],[2,()=>qAdjGN()]])},
+   {n:'Comparativos', d:'Más… que, tan… como, menos… que', g:()=>mix([[5,()=>qGrado(['pos','csup','cigu','cinf'])],[1,()=>qAdjTocar()]])},
+   {n:'Superlativos', d:'El más alto, altísimo, óptimo', g:()=>mix([[4,()=>qGrado(Object.keys(GR))],[3,()=>qSuper()],[2,()=>qCulto()]])},
+ ]},
+ {id:'imperativo', nombre:'Imperativo', desc:'Órdenes y formas no personales', col:'--c5', ico:'¡!', niveles:[
+   {n:'Imperativo regular', d:'Canta, cantad, cante, canten', g:()=>mix([[3,()=>qImpTest(REG_SIMPLE)],[3,()=>qImpEscribir(REG_SIMPLE)],[2,()=>qImpPersona()]])},
+   {n:'Imperativo irregular', d:'Ten, haz, di, pon, ven, sal, sé, ve', g:()=>mix([[4,()=>qImpTest(IMP_IRR)],[3,()=>qImpEscribir(IMP_IRR)],[1,()=>qImpPersona()]])},
+   {n:'No lo hagáis y formas no personales', d:'No cantéis · cantar, cantando, cantado', g:()=>mix([[3,()=>qImpNeg()],[3,()=>qFNP()],[1,()=>qGerundio()],[1,()=>qImpTest(IMP_VERBOS)]])},
+ ]},
+ {id:'historico', nombre:'El texto histórico', desc:'Estructura, conectores y orden', col:'--c7', ico:'H', niveles:[
+   {n:'Estructura', d:'Título, introducción, desarrollo y conclusión', g:()=>mix([[4,()=>qParte()],[2,()=>qParteFuncion()],[2,()=>qRasgo()]])},
+   {n:'Conectores y orden', d:'Primero, después, más tarde…', g:()=>mix([[3,()=>qConector()],[2,()=>qHueco()],[3,()=>qOrdenar()]])},
+   {n:'Presente histórico', d:'«En 1492 Colón llega a América»', g:()=>mix([[4,()=>qTiempoHist()],[2,()=>qOrdenar()],[2,()=>qParte()],[1,()=>qRasgo()]])},
+ ]},
+ {id:'recursos', nombre:'Recursos literarios', desc:'Metáfora, comparación, hipérbole…', col:'--c8', ico:'R', niveles:[
+   {n:'Sonidos y palabras', d:'Aliteración y repetición', g:()=>mix([[3,()=>qRecEj(['aliteracion','repeticion'])],[2,()=>qRecDef(['aliteracion','repeticion'])],[2,()=>qRecVF(['aliteracion','repeticion'])]])},
+   {n:'Metáfora y comparación', d:'«Tus dientes son perlas» o «como perlas»', g:()=>mix([[4,()=>qRecEj(['metafora','comparacion','aliteracion','repeticion'])],[2,()=>qRecDef(['metafora','comparacion'])],[2,()=>qRecVF(['metafora','comparacion'])],[1,()=>qRecFrase(['metafora','comparacion'])]])},
+   {n:'Todos los recursos', d:'También personificación e hipérbole', g:()=>mix([[4,()=>qRecEj(Object.keys(REC))],[2,()=>qRecFrase(Object.keys(REC))],[2,()=>qRecDef(Object.keys(REC))],[2,()=>qRecVF(Object.keys(REC))]])},
+ ]},
+ {id:'ortografia', nombre:'Las tildes', desc:'Compuestas, -mente y tilde diacrítica', col:'--c9', ico:'´', niveles:[
+   {n:'Palabras compuestas', d:'Sacapuntas, ciempiés, hidroavión', g:()=>mix([[3,()=>qCompEscribir()],[3,()=>qCompTest()],[2,()=>qCompPartes()]])},
+   {n:'Adverbios en -mente', d:'Práctico → prácticamente', g:()=>mix([[4,()=>qMenteEscribir()],[3,()=>qMenteTest()],[1,()=>qCompTest()]])},
+   {n:'Tilde diacrítica', d:'Té / te, tú / tu, sí / si, ¿qué?', g:()=>mix([[5,()=>qDiacr()],[2,()=>qMono()],[2,()=>qDiacrTipo()]])},
+ ]},
+ {id:'letras', nombre:'Letras difíciles', desc:'Palabras con h, x, s, g y j', col:'--c10', ico:'h', niveles:[
+   {n:'Palabras con h', d:'Hum-, hie-, hue-, her-, haber…', g:()=>mix([[4,()=>qLetra('h')],[2,()=>qLetraEscribir('h')],[2,()=>qLetraRegla('h')],[1,()=>qExcepcion('h')]])},
+   {n:'Palabras con x y s', d:'Explicar, esqueleto, confusión', g:()=>mix([[4,()=>qLetra('xs')],[2,()=>qLetraEscribir('xs')],[2,()=>qLetraRegla('xs')],[1,()=>qExcepcion('xs')]])},
+   {n:'Palabras con g y j', d:'Escoger, origen, conduje, garaje', g:()=>mix([[4,()=>qLetra('gj')],[2,()=>qLetraEscribir('gj')],[2,()=>qLetraRegla('gj')],[1,()=>qExcepcion('gj')]])},
+ ]},
+ {id:'signos', nombre:'Signos de puntuación', desc:'Punto y coma, comillas, paréntesis…', col:'--c11', ico:';', niveles:[
+   {n:'Punto y coma y puntos suspensivos', d:'Sin embargo; tenis... ¡sorpresa!', g:()=>mix([[3,()=>qSignoUso(['pyc','ps'])],[3,()=>qSignoFalta(['pyc','ps'])],[2,()=>qSignoVF(['pyc','ps'])]])},
+   {n:'Paréntesis, comillas y raya', d:'(1947-2014), “stop”, —Hola', g:()=>mix([[3,()=>qSignoUso(['par','com','raya'])],[3,()=>qSignoFalta(['par','com','raya'])],[2,()=>qSignoVF(['par','com','raya'])]])},
+   {n:'Todos los signos', d:'¿Cuál falta? ¿Para qué sirve?', g:()=>mix([[3,()=>qSignoFalta(Object.keys(SIG))],[3,()=>qSignoUso(Object.keys(SIG))],[2,()=>qSignoDef(Object.keys(SIG))],[1,()=>qSignoVF(Object.keys(SIG))]])},
+ ]},
+];
+
+/* ============ ESTADO ============ */
+const KEY='lenguaventura.v1';
+const AVATARES=['🦊','🦉','🐼','🐯','🐸','🦖','🐙','🐬','🦁','🐨','🐺','🦄'];
+const perfilNuevo = (nombre, avatar) => ({nombre, avatar, monedas:0, niveles:{}, stats:{}, temas:{}, fallos:[], rachaMax:0, crono:0, sesiones:[]});
+let S;
+function cargar(){
+  try{ S = JSON.parse(localStorage.getItem(KEY)); }catch(e){ S=null; }
+  if(!S || !S.perfiles) S = {actual:null, sonido:true, perfiles:{sergio:perfilNuevo('Sergio','🦊'), elena:perfilNuevo('Elena','🦉')}};
+}
+function guardar(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+const P = () => S.perfiles[S.actual];
+const estrellasDe = (m,n) => (P().niveles[`${m}-${n}`]||{}).e || 0;
+const abierto = (m,n) => n===0 || estrellasDe(m,n-1) >= 2;
+
+/* ============ SONIDO ============ */
+let actx;
+function sonar(ok){
+  if(!S.sonido) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const notas = ok ? [660,880] : [300,220];
+    notas.forEach((f,i)=>{ const o=actx.createOscillator(), g=actx.createGain(); o.type= ok?'triangle':'sawtooth'; o.frequency.value=f;
+      g.gain.setValueAtTime(.0001, actx.currentTime+i*.11); g.gain.exponentialRampToValueAtTime(.15, actx.currentTime+i*.11+.02);
+      g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime+i*.11+.18); o.connect(g).connect(actx.destination); o.start(actx.currentTime+i*.11); o.stop(actx.currentTime+i*.11+.2); });
+  }catch(e){}
+}
+function confeti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const c=$('#conf'); c.hidden=false; const x=c.getContext('2d'); c.width=innerWidth; c.height=innerHeight;
+  const cs=getComputedStyle(document.documentElement); const cols=['--c1','--c2','--c3','--c4','--accent'].map(v=>cs.getPropertyValue(v).trim());
+  const ps=Array.from({length:120},()=>({x:Math.random()*c.width, y:-20-Math.random()*c.height*.5, vy:2+Math.random()*4, vx:-2+Math.random()*4, r:Math.random()*6, col:pick(cols), a:Math.random()*6}));
+  let t=0; (function f(){ x.clearRect(0,0,c.width,c.height); ps.forEach(p=>{p.x+=p.vx; p.y+=p.vy; p.a+=.1; x.fillStyle=p.col; x.save(); x.translate(p.x,p.y); x.rotate(p.a); x.fillRect(-4,-7,8,14); x.restore();});
+    if(++t<150) requestAnimationFrame(f); else { c.hidden=true; } })();
+}
+
+/* ============ PANTALLAS ============ */
+const app = $('#app');
+function cabecera(){
+  const p=P();
+  return `<div class="top">
+    <button class="who" data-go="perfil" aria-label="Cambiar jugador"><span class="ava">${p.avatar}</span>${esc(p.nombre)}</button>
+    <div class="chips">
+      <span class="chip" title="Monedas"><span class="coin"></span>${p.monedas}</span>
+      <span class="chip" title="Mejor racha">🔥 ${p.rachaMax}</span>
+      <button class="chip" data-go="sonido" aria-label="Sonido">${S.sonido?'🔊':'🔇'}</button>
+    </div></div>`;
+}
+function vPerfiles(){
+  app.innerHTML = `<div class="hero"><img class="logo" src="logo.jpg" alt="Lenguaventura, 6º de Primaria" width="512" height="512"><div><h1>Lengua<span>ventura</span></h1><p>Lengua de 6º jugando. ¿Quién juega?</p></div></div>
+  <div class="pick">${Object.entries(S.perfiles).map(([id,p])=>`<button class="pcard" data-perfil="${id}"><span class="ava">${p.avatar}</span>${esc(p.nombre)}<small class="muted" style="font-family:var(--body);font-size:15px">${p.monedas} monedas</small></button>`).join('')}</div>`;
+}
+function vMapa(){
+  const p=P();
+  const nf=p.fallos.length;
+  app.innerHTML = cabecera() + `<div class="worlds">${MUNDOS.map((m,mi)=>`
+    <section class="world" style="--wc:var(${m.col})">
+      <div class="whead"><span class="wicon">${m.ico}</span><div><h2>${m.nombre}</h2><p>${m.desc}</p></div>
+        <button class="btn sec sm" data-teoria="${mi}">Teoría</button></div>
+      <div class="levels">${m.niveles.map((n,ni)=>{ const ab=abierto(m.id,ni), e=estrellasDe(m.id,ni);
+        return `<button class="lvl ${ab?'open':'locked'}" ${ab?`data-nivel="${mi}:${ni}"`:'aria-disabled="true" data-bloq="1"'}>
+          <b>${ab?'':'🔒 '}${ni+1}. ${n.n}</b><small>${n.d}</small>
+          <span class="stars">${[0,1,2].map(i=>`<span class="${i<e?'on':''}">★</span>`).join('')}</span></button>`;}).join('')}
+      </div>
+      <div style="padding:0 14px 14px" class="mobonly"><button class="btn sec sm" data-teoria="${mi}" style="width:100%">Teoría de ${m.nombre.toLowerCase()}</button></div>
+    </section>`).join('')}</div>
+  <div class="extras">
+    <button class="xcard" style="--wc:var(--accent)" data-go="crono"><span class="wicon">60</span><span><b>Contrarreloj</b><small>Acierta todo lo que puedas en 60 s · récord ${p.crono}</small></span></button>
+    <button class="xcard" style="--wc:var(--c2)" data-go="repaso" ${nf?'':'disabled'}><span class="wicon">↺</span><span><b>Repaso</b><small>${nf?`${nf} preguntas que fallaste`:'Aún no hay fallos que repasar'}</small></span></button>
+    <button class="xcard" style="--wc:var(--muted)" data-go="familia"><span class="wicon">♥</span><span><b>Zona familia</b><small>Progreso, avatar y ajustes</small></span></button>
+  </div>
+  <p id="aviso" class="muted" style="text-align:center;min-height:1.4em"></p>`;
+  document.querySelectorAll('.mobonly').forEach(e=>e.hidden = innerWidth>560);
+}
+
+/* ---- partida ---- */
+let G=null, timerId=null;
+function nuevaPartida(modo, mi, ni){
+  const qs=[], vistos=new Set();
+  if(modo==='nivel'){
+    const gen=MUNDOS[mi].niveles[ni].g;
+    for(let k=0; qs.length<10 && k<200; k++){ const q=gen(); const key=q.enun+(q.sub||'')+(q.frase||''); if(vistos.has(key)) continue; vistos.add(key); q.mundo=MUNDOS[mi].id; qs.push(q); }
+  } else if(modo==='repaso'){
+    shuffle(P().fallos).slice(0,10).forEach(q=>qs.push({...q, deRepaso:true}));
+  }
+  G = {modo, mi, ni, qs, i:0, ok:0, racha:0, monedas:0, respondida:false, fin: modo==='crono' ? Date.now()+60000 : 0};
+  if(modo==='crono'){ G.qs.push(genCrono()); timerId=setInterval(tick, 250); }
+  vPregunta();
+}
+function genCrono(){
+  const gens=[]; MUNDOS.forEach((m)=>m.niveles.forEach((n,ni)=>{ if(abierto(m.id,ni)) gens.push([m.id,n.g]); }));
+  for(let k=0;k<30;k++){ const [mid,g]=pick(gens); const q=g(); if(q.tipo!=='escribir' && q.tipo!=='ordenar'){ q.mundo=mid; return q; } }
+  const q=qIdent(IND_S,IND_S,REG_SIMPLE); q.mundo='tiempos'; return q;
+}
+function tick(){
+  const s=Math.max(0, Math.ceil((G.fin-Date.now())/1000)); const el=$('#timer'); if(el) el.textContent=s+' s';
+  if(s<=0){ clearInterval(timerId); timerId=null; vResultado(); }
+}
+const colorMundo = id => (MUNDOS.find(m=>m.id===id)||{col:'--accent'}).col;
+function vPregunta(){
+  const q=G.qs[G.i]; G.respondida=false;
+  const tot = G.modo==='crono' ? null : G.qs.length;
+  let cuerpo='';
+  if(q.tipo==='test') cuerpo = `<div class="opts">${q.opciones.map((o,i)=>`<button class="opt" data-op="${i}">${esc(o)}</button>`).join('')}</div>`;
+  if(q.tipo==='vf') cuerpo = `<div class="opts"><button class="opt" data-vf="1">Verdadero</button><button class="opt" data-vf="0">Falso</button></div>`;
+  if(q.tipo==='tocar') cuerpo = `<div class="words">${q.toks.map((k,i)=> k.sp?'': k.pu?`<span>${esc(k.t)}</span>`:`<button class="word" data-w="${i}">${esc(k.t)}</button>`).join('')}</div>`;
+  if(q.tipo==='ordenar'){ G.orden=[]; G.mezcla=shuffle(q.items.map((_,i)=>i));
+    cuerpo = `<div class="order">${G.mezcla.map(i=>`<button class="oitem" data-ord="${i}"><span class="n"></span><span>${esc(q.items[i])}</span></button>`).join('')}</div>
+    <div class="row" style="justify-content:flex-start"><button class="btn sec sm" data-go="ordreset">Empezar de nuevo</button></div>`; }
+  if(q.tipo==='escribir') cuerpo = `<form class="write" id="fw" autocomplete="off"><input id="resp" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Escribe aquí" aria-label="Tu respuesta"><button class="btn" type="submit">Comprobar</button></form>
+    <div class="keys">${['á','é','í','ó','ú','ñ','ü'].map(c=>`<button type="button" data-k="${c}">${c}</button>`).join('')}</div>`;
+  app.innerHTML = `<div style="--wc:var(${colorMundo(q.mundo)})">
+    <div class="gbar"><button class="x" data-go="salir" aria-label="Salir">×</button>
+      ${tot ? `<div class="prog"><i style="width:${G.i/tot*100}%"></i></div><span class="muted" style="font-weight:800">${G.i+1}/${tot}</span>` : `<div class="prog"><i style="width:100%"></i></div><span class="chip">✓ ${G.ok}</span><span class="timer" id="timer">60 s</span>`}
+      ${G.racha>=2?`<span class="streak">🔥${G.racha}</span>`:''}</div>
+    <div class="card"><span class="tema">${esc(q.tema)}${q.deRepaso?' · repaso':''}</span>
+      <div class="enun">${esc(q.enun)}</div>${q.sub?`<div class="sub">${esc(q.sub)}</div>`:''}
+      ${q.frase?`<div class="frase">${q.frase}</div>`:''}
+      ${cuerpo}<div id="fb"></div></div></div>`;
+  if(G.modo==='crono') tick();
+  const inp=$('#resp'); if(inp) inp.focus();
+}
+function corregir(estado, detalle){ // estado: 'ok' | 'casi' | 'ko'
+  if(G.respondida) return; G.respondida=true;
+  const q=G.qs[G.i], p=P(), bien = estado!=='ko';
+  const st = p.stats[q.mundo] = p.stats[q.mundo] || {ok:0,ko:0};
+  const tm = p.temas[q.tema] = p.temas[q.tema] || {ok:0,ko:0};
+  if(bien){ st.ok++; tm.ok++; G.ok++; G.racha++; const m = estado==='casi'?5:10+(G.racha>=3?5:0); G.monedas+=m; p.monedas+=m; p.rachaMax=Math.max(p.rachaMax,G.racha);
+    if(q.deRepaso) p.fallos = p.fallos.filter(f=>!(f.enun===q.enun && f.sub===q.sub && f.frase===q.frase)); }
+  else { st.ko++; tm.ko++; G.racha=0; const {deRepaso, ...limpio}=q;
+    if(!p.fallos.some(f=>f.enun===q.enun && f.sub===q.sub && f.frase===q.frase)) { p.fallos.push(limpio); if(p.fallos.length>60) p.fallos.shift(); } }
+  guardar(); sonar(bien);
+  if(G.modo==='crono'){ setTimeout(()=>{ if(!G||G.modo!=='crono'||!timerId) return; G.qs.push(genCrono()); G.i++; vPregunta(); }, bien?350:1100);
+    const fb=$('#fb'); fb.innerHTML = `<div class="fb ${bien?'good':'bad'}"><div class="body"><div class="t">${bien?'¡Bien!':'¡Uy!'}</div>${bien?'':`<p>${detalle}</p>`}</div></div>`; return; }
+  const titulo = estado==='ok' ? pick(['¡Correcto!','¡Muy bien!','¡Genial!','¡Perfecto!']) : estado==='casi' ? '¡Casi! Ojo con la tilde' : 'No es correcto';
+  $('#fb').innerHTML = `<div class="fb ${bien?'good':'bad'}"><div class="body"><div class="t">${titulo}</div>${detalle?`<p>${detalle}</p>`:''}<p>${esc(q.exp)}</p></div>
+    <button class="btn" data-go="sig" id="sig">${G.i+1<G.qs.length?'Siguiente':'Ver resultado'}</button></div>`;
+  $('#sig').focus({preventScroll:true}); $('#fb').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+function vResultado(){
+  const p=P(); let e=0, txt='';
+  if(G.modo==='crono'){
+    const rec = G.ok>p.crono; if(rec) p.crono=G.ok;
+    txt = `<h2>¡Tiempo!</h2><div class="score">${G.ok} aciertos</div><p class="muted">${rec?'¡Nuevo récord!':`Récord: ${p.crono}`}</p>`;
+    if(rec && G.ok>0) confeti();
+  } else {
+    const tot=G.qs.length; e = G.ok>=tot-1 ? 3 : G.ok>=tot*.7 ? 2 : G.ok>=tot*.5 ? 1 : 0;
+    if(G.modo==='nivel'){
+      const k=`${MUNDOS[G.mi].id}-${G.ni}`, prev=p.niveles[k]||{e:0,mejor:0}; const antes=abierto(MUNDOS[G.mi].id,G.ni+1);
+      p.niveles[k]={e:Math.max(prev.e,e), mejor:Math.max(prev.mejor,G.ok)};
+      const desbloq = G.ni<2 && !antes && abierto(MUNDOS[G.mi].id,G.ni+1);
+      txt = `<h2>${MUNDOS[G.mi].niveles[G.ni].n}</h2>`;
+      if(desbloq) txt += `<p class="streak">¡Has desbloqueado el nivel ${G.ni+2}!</p>`;
+      else if(e<2 && G.ni<2 && !antes) txt += `<p class="muted">Consigue 2 estrellas (7 aciertos) para abrir el siguiente nivel.</p>`;
+    } else txt = `<h2>Repaso</h2><p class="muted">Te quedan ${p.fallos.length} preguntas por repasar.</p>`;
+    txt = `<div class="bigstars">${[0,1,2].map(i=>`<span class="${i<e?'on':''}">★</span>`).join('')}</div>` + txt + `<div class="score">${G.ok} / ${tot}</div>`;
+    if(e===3) confeti();
+  }
+  p.sesiones.unshift({f:Date.now(), modo:G.modo, m:G.modo==='nivel'?MUNDOS[G.mi].nombre+' · '+(G.ni+1):G.modo==='crono'?'Contrarreloj':'Repaso', ok:G.ok, tot:G.modo==='crono'?null:G.qs.length});
+  p.sesiones = p.sesiones.slice(0,30); guardar();
+  app.innerHTML = cabecera() + `<div class="card res">${txt}<p><span class="chip"><span class="coin"></span>+${G.monedas}</span></p>
+    <div class="row">${G.modo!=='repaso'?`<button class="btn" data-go="otra">Jugar otra vez</button>`:''}<button class="btn sec" data-go="mapa">Volver al mapa</button></div></div>`;
+}
+
+/* ---- teoría ---- */
+function tablaVerbo(inf, ids){
+  const v=VERBO[inf];
+  return `<div class="tbl"><table><thead><tr><th>Persona</th>${ids.map(id=>`<th>${TI[id].n}<br><span class="muted">${TI[id].b}</span></th>`).join('')}</tr></thead><tbody>
+    ${PERS.map((pp,i)=>`<tr><th>${pp.pr}</th>${ids.map(id=>{const f=conj(v,id)[i], r=conjReg(v,id)[i]; return `<td class="${f!==r?'irr':''}">${f}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`;
+}
+function conjugador(lista, sel){
+  return `<h3>Conjugador</h3><p class="muted">Elige un verbo. ${lista===IRR?'En rosa, las formas irregulares.':''}</p>
+   <select id="selv">${lista.map(v=>`<option ${v.inf===sel?'selected':''}>${v.inf}</option>`).join('')}</select>
+   <div id="tablas">${tablasDe(sel)}</div>`;
+}
+const tablasDe = inf => `<h3>Indicativo · simples</h3>${tablaVerbo(inf,IND_S)}<h3>Indicativo · compuestos</h3>${tablaVerbo(inf,IND_C)}<h3>Subjuntivo</h3>${tablaVerbo(inf,SUB)}`;
+function vTeoria(mi){
+  const m=MUNDOS[mi]; let h='';
+  if(m.id==='tiempos') h = `<p>Los <b>tiempos simples</b> son una sola palabra (amo, amaré). Los <b>tiempos compuestos</b> se forman con el verbo <b>haber</b> + el <b>participio</b> (he amado). En tu libro cada tiempo tiene dos nombres.</p>
+    <h3>Indicativo</h3><div class="tgrid">${IND.map(id=>{const t=TI[id]; return `<div class="tbox"><b>${t.n}</b> <span class="alias">o ${t.b}</span><p style="margin:4px 0 0">${t.u}</p><p class="muted" style="margin:2px 0 0">${t.aux?`haber (${TI[t.aux].n.toLowerCase()}) + participio · `:''}yo ${conj(VERBO.amar,id)[0]}</p></div>`;}).join('')}</div>
+    <h3>Subjuntivo</h3><div class="tgrid">${SUB.map(id=>{const t=TI[id]; return `<div class="tbox"><b>${t.n}</b> <span class="alias">o ${t.b}</span><p style="margin:4px 0 0">${t.u}</p><p class="muted" style="margin:2px 0 0">que yo ${conj(VERBO.amar,id)[0]}</p></div>`;}).join('')}</div>
+    <h3>Raíz y desinencias</h3><p>Según su infinitivo, los verbos son de la <b>1ª conjugación</b> (-ar: reg-ar), <b>2ª</b> (-er: crec-er) o <b>3ª</b> (-ir: reduc-ir). La <b>raíz</b> aporta el significado (naveg-ar → naveg-). Las <b>desinencias</b> indican persona, número, tiempo y modo: naveg-<b>aban</b>, perd-<b>erías</b>, dec-<b>ían</b>.</p>
+    <h3>El participio</h3><p>Termina en <b>-ado</b> (verbos en -ar: amado) o en <b>-ido</b> (verbos en -er, -ir: comido, vivido). Algunos son irregulares: escrito, abierto, roto, hecho, dicho, puesto, vuelto, visto.</p>
+    ${conjugador(REG,'amar')}`;
+  if(m.id==='irregulares') h = `<p>Un verbo es <b>irregular</b> cuando cambia su raíz o sus terminaciones respecto al modelo (amar, temer, partir). Truco: si en el pretérito perfecto simple cambia, también cambia en el pretérito imperfecto y el futuro de subjuntivo (tuve → tuviera → tuviere).</p>
+    <div class="tgrid"><div class="tbox"><b>Errores típicos</b><p style="margin:4px 0 0">andé → <b>anduve</b> · cabo → <b>quepo</b> · conducí → <b>conduje</b> · hació → <b>hizo</b> · ponido → <b>puesto</b> · rompido → <b>roto</b> · satisfació → <b>satisfizo</b></p></div>
+    <div class="tbox"><b>Futuro irregular</b><p style="margin:4px 0 0">tendré, haré, diré, podré, pondré, querré, sabré, vendré, cabré, saldré</p></div></div>
+    ${conjugador(IRR,'tener')}`;
+  if(m.id==='determinantes') h = `<p>Los <b>determinantes</b> van delante del sustantivo y concretan su significado. Concuerdan con él en género y número.</p>
+    <div class="tgrid">${Object.keys(DT).map(k=>`<div class="tbox"><b>${DT[k]}</b><p style="margin:4px 0 0">${DT_EXP[k]}</p></div>`).join('')}</div>
+    <h3>Demostrativos</h3><div class="tbl"><table><thead><tr><th>Distancia</th><th>Masc. sing.</th><th>Fem. sing.</th><th>Masc. pl.</th><th>Fem. pl.</th></tr></thead><tbody>
+    <tr><th>Cercanía</th><td>este</td><td>esta</td><td>estos</td><td>estas</td></tr><tr><th>Distancia media</th><td>ese</td><td>esa</td><td>esos</td><td>esas</td></tr><tr><th>Lejanía</th><td>aquel</td><td>aquella</td><td>aquellos</td><td>aquellas</td></tr></tbody></table></div>
+    <h3>Posesivos</h3><div class="tbl"><table><thead><tr><th>Poseedor</th><th>Un poseedor</th><th>Varios poseedores</th></tr></thead><tbody>
+    <tr><th>1ª persona</th><td>mi, mis</td><td>nuestro, nuestra, nuestros, nuestras</td></tr><tr><th>2ª persona</th><td>tu, tus</td><td>vuestro, vuestra, vuestros, vuestras</td></tr><tr><th>3ª persona</th><td>su, sus</td><td>su, sus</td></tr></tbody></table></div>`;
+  if(m.id==='pronombres') h = `<p>Los <b>pronombres personales</b> sustituyen a un nombre o señalan a las personas que participan en la comunicación.</p>
+    <div class="tbl"><table><thead><tr><th></th><th></th><th>1ª persona</th><th>2ª persona</th><th>3ª persona</th></tr></thead><tbody>
+    <tr><th rowspan="2">Singular</th><th>Tónicos</th><td>yo, mí, conmigo</td><td>tú, usted, ti, contigo</td><td>él, ella, sí, consigo</td></tr>
+    <tr><th>Átonos</th><td>me</td><td>te</td><td>se, lo, la, le</td></tr>
+    <tr><th rowspan="2">Plural</th><th>Tónicos</th><td>nosotros, nosotras</td><td>vosotros, vosotras, ustedes</td><td>ellos, ellas, sí, consigo</td></tr>
+    <tr><th>Átonos</th><td>nos</td><td>os</td><td>se, los, las, les</td></tr></tbody></table></div>
+    <h3>¿Determinante o pronombre?</h3><p>Algunos determinantes comparten forma con pronombres: <b>demostrativos</b>, <b>cardinales</b> e <b>indefinidos</b>. Si van delante del nombre son determinantes (<i>varios amigos</i>); si van solos son pronombres (<i>Hablaremos de eso más tarde. Han llegado cuatro. Había varios en la terraza.</i>).</p>`;
+  if(m.id==='imperativo'){ const tb=(vs)=>`<div class="tbl"><table><thead><tr><th>Persona</th>${vs.map(x=>`<th>${x}</th>`).join('')}</tr></thead><tbody>${IMP_P.map(P=>`<tr><th>${P.pr}</th>${vs.map(x=>`<td class="${IMP_TU[x]&&P.k==='tu'?'irr':''}">${imperativo(VERBO[x])[P.k]}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    h = `<p>El <b>imperativo</b> sirve para dar órdenes, consejos o pedir algo. Solo tiene formas para tú, usted, vosotros y ustedes.</p>${tb(['amar','comer','vivir'])}
+    <div class="tgrid" style="margin-top:12px"><div class="tbox"><b>Cómo se forma</b><p style="margin:4px 0 0">${IMP_EXP}</p></div>
+    <div class="tbox"><b>Errores típicos</b><p style="margin:4px 0 0">¡Venir aquí! → <b>¡Venid aquí!</b> · No hablad → <b>No habléis</b> · No canta → <b>No cantes</b></p></div>
+    <div class="tbox"><b>Órdenes negativas</b><p style="margin:4px 0 0">No + presente de subjuntivo: no cantes, no cantéis, no cante, no canten.</p></div></div>
+    <h3>Imperativos irregulares (tú)</h3>${tb(['tener','hacer','decir','poner'])}${tb(['venir','salir','ser','ir'])}
+    <h3>Formas no personales</h3><p>No indican persona ni número.</p><div class="tbl"><table><thead><tr><th></th><th>amar</th><th>comer</th><th>vivir</th></tr></thead><tbody>
+    ${FNP.map((n,i)=>`<tr><th>${n}</th>${['amar','comer','vivir'].map(x=>{const v=VERBO[x]; return `<td>${[v.inf,gerundio(v),part(v),'haber '+part(v),'habiendo '+part(v)][i]}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`; }
+  if(m.id==='signos') h = `<p>El <b>punto y coma</b> indica una pausa más larga que la coma y un poco más corta que el punto.</p>` + Object.keys(SIG).map(k=>`<h3>${SIG[k].n}</h3><ul>${Object.keys(USOS).filter(u=>USOS[u][0]===k).map(u=>`<li>${USOS[u][1]}: <i>${esc(SIG_EJ.find(x=>x[0]===u)[1])}</i></li>`).join('')}</ul>`).join('');
+  if(m.id==='letras') h = [['h','Palabras con h'],['x','Se escriben con x'],['s','Se escriben con s'],['g','Se escriben con g'],['j','Se escriben con j']].map(([l,t])=>`<h3>${t}</h3><ul>${Object.keys(REGLAS).filter(k=>k[0]===l).map(k=>`<li>${REGLAS[k][1]}</li>`).join('')}</ul>`).join('');
+  if(m.id==='ortografia') h = `<h3>Palabras compuestas</h3><p>Se forman a partir de la unión de dos o más palabras simples: <i>sacapuntas, girasol</i>. Se acentúan siguiendo las <b>reglas generales de acentuación</b>, ya que se consideran una sola palabra: <i>hidroavión, undécimo</i>. Al unirse pueden sufrir algún cambio ortográfico: cien + pies → <b>ciempiés</b>.</p>
+    <h3>Adverbios acabados en -mente</h3><p>Se forman a partir de adjetivos y no se les aplican las reglas generales. Si el adjetivo lleva tilde, el adverbio también: práctico → <b>prácticamente</b>; nuevo → <b>nuevamente</b>.</p>
+    <h3>Tilde diacrítica</h3><p>Por regla general, las palabras monosílabas no llevan tilde: <i>le, dio, pie</i>. La tilde diacrítica sirve para diferenciar palabras que se escriben igual pero tienen distinto significado.</p>
+    <div class="tbl"><table><thead><tr><th>Palabra</th><th>Clase</th><th>Ejemplo</th></tr></thead><tbody>
+    ${[['té','Por las mañanas siempre tomo té negro.'],['te','Te he comprado batido de chocolate.'],['tú','Tú vas a clase de canto.'],['tu','Tu gato es muy gracioso.'],['dé','Espero que se dé prisa.'],['de','El vecino de mi abuela es francés.'],['sí','Pau habla para sí mismo. Me dijo que sí.'],['si','Si quieres, vamos a merendar.'],['sé','No sé dónde está. Sé amable con ellos.'],['se','Se lo conté cuando nos vimos.'],['mí','Este regalo es para mí.'],['mi','Mi hermano juega al baloncesto.'],['él','Él trajo la pelota.'],['el','El perro ladra mucho.']].map(([w,e])=>`<tr><td><b>${w}</b></td><td>${DIACR[w]}</td><td><i>${e}</i></td></tr>`).join('')}</tbody></table></div>
+    <p>Qué, quién, cómo, cuándo, dónde, por qué y cuál siempre llevan tilde cuando tienen sentido <b>interrogativo o exclamativo</b>: <i>¿qué pasa?, ¿cuál es la calle?, ¿quién va?</i></p>`;
+  if(m.id==='recursos') h = `<p>Los <b>recursos literarios</b> son figuras que se emplean en textos, tanto en verso como en prosa, para dar expresividad y conseguir un efecto específico.</p>
+    <div class="tgrid">${Object.keys(REC).map(k=>`<div class="tbox"><b>${REC[k].n}</b><p style="margin:4px 0 0">${REC[k].d}</p><p class="muted" style="margin:4px 0 0"><i>${REC_EJ.find(x=>x[0]===k)[1]}</i></p></div>`).join('')}</div>
+    <h3>Truco: metáfora o comparación</h3><p>Si aparece <b>como</b>, <b>igual que</b> o <b>parece</b>, es comparación (tus ojos son <b>como</b> luceros). Si no aparece, es metáfora (tus ojos son luceros).</p>`;
+  if(m.id==='historico') h = `<p>Los <b>textos históricos</b> cuentan hechos del pasado ordenados de manera cronológica, de más antiguo a más moderno. Utilizan <b>conectores temporales</b> para organizar la información (más tarde, antes, después…) e incluyen gran cantidad de datos y fechas. Se escriben en <b>pasado</b> o en <b>presente histórico</b>. Suelen ir acompañados de mapas, imágenes u organizadores gráficos.</p>
+    <h3>Estructura</h3><div class="tgrid">${PARTES.map(x=>`<div class="tbox"><b>${x}</b><p style="margin:4px 0 0">${PARTES_EXP[x]}</p></div>`).join('')}</div>
+    <h3>Lecturas del juego</h3>${TEXTOS.map(T=>`<div class="lectura"><span class="parte">Título</span><h3 style="margin:2px 0 4px">${T.t}</h3><span class="parte">Introducción</span><p>${T.i}</p><span class="parte">Desarrollo</span><p>${T.d}</p><span class="parte">Conclusión</span><p>${T.c}</p></div>`).join('')}`;
+  if(m.id==='adjetivos') h = `<p>El <b>adjetivo calificativo</b> dice cómo es el sustantivo y concuerda con él en género y número (casa blanca, coches blancos).</p>
+    <h3>Grados del adjetivo</h3><div class="tgrid">${Object.keys(GR).map(k=>`<div class="tbox"><b>${GR[k]}</b><p style="margin:4px 0 0">${GR_EXP[k]}</p></div>`).join('')}</div>
+    <h3>Formas especiales</h3><div class="tbl"><table><thead><tr><th>Positivo</th><th>Comparativo</th><th>Superlativo culto</th></tr></thead><tbody>${CULTOS.map(c=>`<tr><td>${c.b}</td><td>${c.comp}</td><td>${c.sup}</td></tr>`).join('')}</tbody></table></div>
+    <h3>Superlativos en -ísimo</h3><p>${SUPER.slice(0,12).map(([b,r])=>`${b} → <b>${r[0]}</b>`).join(' · ')}</p>`;
+  app.innerHTML = cabecera() + `<div class="card theory" style="--wc:var(${m.col})"><div class="gbar"><button class="x" data-go="mapa" aria-label="Volver">←</button><h2 style="margin:0">${m.nombre}</h2></div>${h}
+    <div class="row"><button class="btn" data-go="mapa">Volver al mapa</button></div></div>`;
+}
+
+/* ---- familia ---- */
+let famTab=null, borrar=false;
+function vFamilia(){
+  famTab = famTab || S.actual; const p=S.perfiles[famTab];
+  const barras = MUNDOS.map(m=>{ const s=p.stats[m.id]||{ok:0,ko:0}, n=s.ok+s.ko, pc=n?Math.round(s.ok/n*100):0;
+    return `<div class="bar"><b>${m.nombre}</b><div class="tr"><i style="width:${pc}%;background:var(${m.col})"></i></div><span>${n?pc+'%':'—'}</span></div>`; }).join('');
+  const temas = Object.entries(p.temas).filter(([,s])=>s.ok+s.ko>=3).map(([t,s])=>[t,s.ok/(s.ok+s.ko),s.ok+s.ko]).sort((a,b)=>a[1]-b[1]).slice(0,6);
+  app.innerHTML = cabecera() + `<div class="card"><div class="gbar"><button class="x" data-go="mapa" aria-label="Volver">←</button><h2 style="margin:0">Zona familia</h2></div>
+    <div class="tabs">${Object.entries(S.perfiles).map(([id,pp])=>`<button data-tab="${id}" aria-pressed="${id===famTab}">${pp.avatar} ${esc(pp.nombre)}</button>`).join('')}</div>
+    <p class="muted">El progreso se guarda en esta tablet. ${esc(p.nombre)} tiene ${p.monedas} monedas, mejor racha ${p.rachaMax} y récord de contrarreloj ${p.crono}.</p>
+    <h3>Aciertos por mundo</h3><div class="bars">${barras}</div>
+    <h3 style="margin-top:18px">Lo que más le cuesta</h3>${temas.length?`<ul class="list">${temas.map(([t,r,n])=>`<li><span>${esc(t)}</span><b>${Math.round(r*100)}% de ${n}</b></li>`).join('')}</ul>`:'<p class="muted">Todavía hay pocos datos.</p>'}
+    <h3 style="margin-top:18px">Últimas partidas</h3>${p.sesiones.length?`<ul class="list">${p.sesiones.slice(0,8).map(s=>`<li><span>${new Date(s.f).toLocaleDateString('es-ES',{day:'numeric',month:'short'})} · ${esc(s.m)}</span><b>${s.ok}${s.tot?' / '+s.tot:' aciertos'}</b></li>`).join('')}</ul>`:'<p class="muted">Aún no ha jugado.</p>'}
+    <h3 style="margin-top:18px">Avatar</h3><div class="avs">${AVATARES.map(a=>`<button data-av="${a}" aria-pressed="${a===p.avatar}">${a}</button>`).join('')}</div>
+    <h3 style="margin-top:18px">Ajustes</h3>
+    <div class="row" style="justify-content:flex-start"><button class="btn sec sm" data-go="borrar">Borrar progreso de ${esc(p.nombre)}</button></div>
+    ${borrar?`<div class="confirm"><span>¿Seguro? Se borrarán estrellas, monedas y estadísticas de ${esc(p.nombre)}.</span><button class="btn sm" data-go="borrarsi">Sí, borrar</button><button class="btn sec sm" data-go="borrarno">Cancelar</button></div>`:''}
+  </div>`;
+}
+
+/* ============ EVENTOS ============ */
+app.addEventListener('click', ev=>{
+  const b = ev.target.closest('button'); if(!b) return;
+  const d = b.dataset;
+  if(d.perfil){ S.actual=d.perfil; guardar(); return vMapa(); }
+  if(d.nivel){ const [mi,ni]=d.nivel.split(':').map(Number); return nuevaPartida('nivel',mi,ni); }
+  if(d.bloq){ const a=$('#aviso'); if(a) a.textContent='Consigue 2 estrellas en el nivel anterior para abrir este.'; return; }
+  if(d.teoria){ vTeoria(+d.teoria); return scrollTo(0,0); }
+  if(d.tab){ famTab=d.tab; borrar=false; return vFamilia(); }
+  if(d.av){ S.perfiles[famTab].avatar=d.av; guardar(); return vFamilia(); }
+  if(d.k){ const i=$('#resp'); if(i){ const s=i.selectionStart??i.value.length; i.value=i.value.slice(0,s)+d.k+i.value.slice(i.selectionEnd??s); i.focus(); i.setSelectionRange(s+1,s+1);} return; }
+  if(d.op!==undefined && G && !G.respondida){ const q=G.qs[G.i], el=q.opciones[+d.op], ok=el===q.resp;
+    document.querySelectorAll('.opt').forEach(o=>{ o.disabled=true; if(q.opciones[+o.dataset.op]===q.resp) o.classList.add('good'); }); if(!ok) b.classList.add('bad');
+    return corregir(ok?'ok':'ko', ok?'':`La respuesta correcta es: <b>${esc(q.resp)}</b>.`); }
+  if(d.vf!==undefined && G && !G.respondida){ const q=G.qs[G.i], r=d.vf==='1', ok=r===q.resp;
+    document.querySelectorAll('.opt').forEach(o=>{ o.disabled=true; if((o.dataset.vf==='1')===q.resp) o.classList.add('good'); }); if(!ok) b.classList.add('bad');
+    return corregir(ok?'ok':'ko', ok?'':`Era <b>${q.resp?'verdadero':'falso'}</b>.`); }
+  if(d.ord!==undefined && G && !G.respondida){ const i=+d.ord; if(G.orden.includes(i)) return;
+    G.orden.push(i); b.classList.add('sel'); b.querySelector('.n').textContent=G.orden.length;
+    const q=G.qs[G.i]; if(G.orden.length<q.items.length) return;
+    const ok=G.orden.every((x,k)=>x===k);
+    document.querySelectorAll('.oitem').forEach(o=>{ o.disabled=true; const j=+o.dataset.ord; o.classList.add(G.orden.indexOf(j)===j?'good':'bad'); });
+    document.querySelector('[data-go="ordreset"]').disabled=true;
+    return corregir(ok?'ok':'ko', ok?'':'Fíjate en las fechas y en los conectores temporales.'); }
+  if(d.w!==undefined && G && !G.respondida){ const q=G.qs[G.i], ok=q.toks[+d.w].ok;
+    document.querySelectorAll('.word').forEach(w=>{ w.disabled=true; if(q.toks[+w.dataset.w].ok) w.classList.add('good'); }); if(!ok) b.classList.add('bad');
+    return corregir(ok?'ok':'ko', ok?'':'Mira las palabras en verde.'); }
+  switch(d.go){
+    case 'perfil': return vPerfiles();
+    case 'ordreset': if(G && !G.respondida){ G.orden=[]; document.querySelectorAll('.oitem').forEach(o=>{o.classList.remove('sel'); o.querySelector('.n').textContent='';}); } return;
+    case 'sonido': S.sonido=!S.sonido; guardar(); b.textContent=S.sonido?'🔊':'🔇'; return;
+    case 'mapa': G=null; borrar=false; vMapa(); return scrollTo(0,0);
+    case 'salir': if(timerId){clearInterval(timerId); timerId=null;} G=null; return vMapa();
+    case 'sig': G.i++; if(G.i>=G.qs.length) return vResultado(); vPregunta(); return scrollTo(0,0);
+    case 'otra': return nuevaPartida(G.modo, G.mi, G.ni);
+    case 'crono': return nuevaPartida('crono');
+    case 'repaso': return nuevaPartida('repaso');
+    case 'familia': famTab=S.actual; borrar=false; return vFamilia();
+    case 'borrar': borrar=true; return vFamilia();
+    case 'borrarno': borrar=false; return vFamilia();
+    case 'borrarsi': { const p=S.perfiles[famTab]; S.perfiles[famTab]=perfilNuevo(p.nombre,p.avatar); borrar=false; guardar(); return vFamilia(); }
+  }
+});
+app.addEventListener('submit', ev=>{
+  ev.preventDefault(); if(!G || G.respondida) return;
+  const q=G.qs[G.i], inp=$('#resp'), v=norm(inp.value); if(!v) return;
+  const exacto = q.resp.some(r=>norm(r)===v), casi = !exacto && !q.estricto && q.resp.some(r=>sinTilde(norm(r))===sinTilde(v));
+  inp.disabled=true; inp.classList.add(exacto||casi?'good':'bad');
+  document.querySelectorAll('.write button, .keys button').forEach(x=>x.disabled=true);
+  corregir(exacto?'ok':casi?'casi':'ko', exacto?'':`Se escribe: <b>${esc(q.resp[0])}</b>.`);
+});
+app.addEventListener('change', ev=>{ if(ev.target.id==='selv') $('#tablas').innerHTML=tablasDe(ev.target.value); });
+document.addEventListener('keydown', ev=>{ if(ev.key==='Enter' && G && G.respondida && $('#sig') && document.activeElement?.id!=='resp'){ ev.preventDefault(); $('#sig').click(); } });
+
+cargar();
+if(S.actual && S.perfiles[S.actual]) vMapa(); else vPerfiles();
+</script>
+<script>if("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(()=>{});</script>
+</body></html>
