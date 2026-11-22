@@ -1280,7 +1280,7 @@ function corregir(estado, detalle){ // estado: 'ok' | 'casi' | 'ko'
   guardar(); sonar(bien);
   if(G.modo==='crono'){ setTimeout(()=>{ if(!G||G.modo!=='crono'||!timerId) return; G.qs.push(genCrono()); G.i++; vPregunta(); }, bien?350:1100);
     const fb=$('#fb'); fb.innerHTML = `<div class="fb ${bien?'good':'bad'}"><div class="body"><div class="t">${bien?'¡Bien!':'¡Uy!'}</div>${bien?'':`<p>${detalle}</p>`}</div></div>`; return; }
-  const titulo = estado==='ok' ? pick(['¡Correcto!','¡Muy bien!','¡Genial!','¡Perfecto!']) : estado==='casi' ? '¡Casi! Ojo con la tilde' : 'No es correcto';
+  const titulo = estado==='ok' ? pick(['¡Correcto!','¡Muy bien!','¡Genial!','¡Perfecto!']) : 'No es correcto';
   $('#fb').innerHTML = `<div class="fb ${bien?'good':'bad'}"><div class="body"><div class="t">${titulo}</div>${detalle?`<p>${detalle}</p>`:''}<p>${esc(q.exp)}</p></div>
     <button class="btn" data-go="sig" id="sig">${G.i+1<G.qs.length?'Siguiente':'Ver resultado'}</button></div>`;
   $('#sig').focus({preventScroll:true}); $('#fb').scrollIntoView({behavior:'smooth', block:'nearest'});
@@ -1453,10 +1453,10 @@ app.addEventListener('click', ev=>{
 app.addEventListener('submit', ev=>{
   ev.preventDefault(); if(!G || G.respondida) return;
   const q=G.qs[G.i], inp=$('#resp'), v=norm(inp.value); if(!v) return;
-  const exacto = q.resp.some(r=>norm(r)===v), casi = !exacto && !q.estricto && q.resp.some(r=>sinTilde(norm(r))===sinTilde(v));
-  inp.disabled=true; inp.classList.add(exacto||casi?'good':'bad');
+  const exacto = q.resp.some(r=>norm(r)===v), tilde = !exacto && q.resp.some(r=>sinTilde(norm(r))===sinTilde(v));
+  inp.disabled=true; inp.classList.add(exacto?'good':'bad');
   document.querySelectorAll('.write button, .keys button').forEach(x=>x.disabled=true);
-  corregir(exacto?'ok':casi?'casi':'ko', exacto?'':`Se escribe: <b>${esc(q.resp[0])}</b>.`);
+  corregir(exacto?'ok':'ko', exacto?'':tilde?`Fallo de tilde. Se escribe: <b>${esc(q.resp[0])}</b>. Las tildes cuentan.`:`Se escribe: <b>${esc(q.resp[0])}</b>.`);
 });
 app.addEventListener('change', ev=>{ if(ev.target.id==='selv') $('#tablas').innerHTML=tablasDe(ev.target.value); });
 document.addEventListener('keydown', ev=>{ if(ev.key==='Enter' && G && G.respondida && $('#sig') && document.activeElement?.id!=='resp'){ ev.preventDefault(); $('#sig').click(); } });
