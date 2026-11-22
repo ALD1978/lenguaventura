@@ -48,6 +48,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 .ava svg,.avs svg{width:100%;height:100%;display:block}
 .mini{display:inline-block;width:24px;height:24px;vertical-align:middle}.mini svg{width:100%;height:100%}
 .chips{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
+.chip.salir{color:var(--ko);border-color:color-mix(in srgb,var(--ko) 40%,var(--line))}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:800;font-variant-numeric:tabular-nums}
 .coin{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE38A,#F2A900 70%);box-shadow:inset 0 -2px 0 #C98500}
 
@@ -1192,7 +1193,18 @@ function cabecera(){
       <span class="chip" title="Monedas"><span class="coin"></span>${p.monedas}</span>
       <span class="chip" title="Mejor racha">🔥 ${p.rachaMax}</span>
       <button class="chip" data-go="sonido" aria-label="Sonido">${S.sonido?'🔊':'🔇'}</button>
+      <button class="chip salir" data-go="salirapp" aria-label="Salir de la aplicación">⏻ Salir</button>
     </div></div>`;
+}
+function vSalir(){
+  guardar();
+  app.innerHTML = `<div class="card res"><div class="ava" style="width:96px;height:96px;margin:0 auto">${avaHTML(P()?P().avatar:'collie')}</div>
+    <h2 style="margin-top:12px">¿Salir de Lenguaventura?</h2><p class="muted">Tu progreso está guardado.</p>
+    <div class="row"><button class="btn" data-go="cerrar">Sí, salir</button><button class="btn sec" data-go="mapa">No, seguir jugando</button></div></div>`;
+}
+function vAdios(){
+  app.innerHTML = `<div class="card res"><h2>¡Hasta pronto, ${esc(P()?P().nombre:'')}!</h2><p class="muted">Tu progreso está guardado. Ya puedes cerrar la aplicación con el botón de inicio o de atrás de la tablet.</p>
+    <div class="row"><button class="btn sec" data-go="mapa">Volver a jugar</button></div></div>`;
 }
 function vPerfiles(){
   app.innerHTML = `<div class="hero"><img class="logo" src="logo.jpg" alt="Lenguaventura, 6º de Primaria" width="512" height="512"><div><h1>Lengua<span>ventura</span></h1><p>Lengua de 6º jugando. ¿Quién juega?</p></div></div>
@@ -1437,6 +1449,8 @@ app.addEventListener('click', ev=>{
   switch(d.go){
     case 'perfil': return vPerfiles();
     case 'ordreset': if(G && !G.respondida){ G.orden=[]; document.querySelectorAll('.oitem').forEach(o=>{o.classList.remove('sel'); o.querySelector('.n').textContent='';}); } return;
+    case 'salirapp': if(timerId){clearInterval(timerId); timerId=null;} G=null; return vSalir();
+    case 'cerrar': guardar(); try{ window.close(); }catch(e){} setTimeout(vAdios, 300); return;
     case 'sonido': S.sonido=!S.sonido; guardar(); b.textContent=S.sonido?'🔊':'🔇'; return;
     case 'mapa': G=null; borrar=false; vMapa(); return scrollTo(0,0);
     case 'salir': if(timerId){clearInterval(timerId); timerId=null;} G=null; return vMapa();
