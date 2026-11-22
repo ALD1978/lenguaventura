@@ -7,7 +7,7 @@
 :root{
   --bg:#EEF2FB; --surface:#FFFFFF; --surface2:#F5F7FD; --ink:#1B2545; --muted:#5D6787; --line:#D9DFEF;
   --accent:#FF6B35; --accent-ink:#FFFFFF;
-  --c1:#3767F0; --c2:#E0457B; --c3:#14A06C; --c4:#E59A00; --c5:#7B5CF0; --c6:#0E8F9B; --c7:#9A5B22; --c8:#B0388F; --c9:#C2410C; --c10:#4D7C0F; --c11:#BE123C;
+  --c1:#3767F0; --c2:#E0457B; --c3:#14A06C; --c4:#E59A00; --c5:#7B5CF0; --c6:#0E8F9B; --c7:#9A5B22; --c8:#B0388F; --c9:#C2410C; --c10:#4D7C0F; --c11:#BE123C; --c12:#0369A1; --c13:#9333EA;
   --ok:#139A52; --ok-bg:#DDF5E7; --ko:#D23F3F; --ko-bg:#FBE1E1; --star:#FFB400;
   --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
   --body:"Nunito","Segoe UI",system-ui,sans-serif;
@@ -16,12 +16,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111729; --surface:#1B2340; --surface2:#222C4E; --ink:#E9EDFF; --muted:#A3ADD0; --line:#2F3A63;
   --accent:#FF8350; --accent-ink:#1B1200;
-  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185;
+  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185; --c12:#38BDF8; --c13:#C084FC;
   --ok:#4BD98A; --ok-bg:#183C2B; --ko:#FF7B7B; --ko-bg:#4A2026; --star:#FFC83D; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111729; --surface:#1B2340; --surface2:#222C4E; --ink:#E9EDFF; --muted:#A3ADD0; --line:#2F3A63;
   --accent:#FF8350; --accent-ink:#1B1200;
-  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185;
+  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185; --c12:#38BDF8; --c13:#C084FC;
   --ok:#4BD98A; --ok-bg:#183C2B; --ko:#FF7B7B; --ko-bg:#4A2026; --star:#FFC83D; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -961,6 +961,111 @@ function qSignoVF(ks){
   return {tipo:'vf', tema:'Signos de puntuación', enun:`Aquí ${SIG[k].n.split(' (')[0].toLowerCase()} sirve para ${USOS[dice][1].charAt(0).toLowerCase()+USOS[dice][1].slice(1)}.`, frase:marcaSig(f,k), resp:verdad, exp:usoExp(u)};
 }
 
+
+/* ============ TIPOS DE VERBOS ============ */
+const CAMBIOS = [ // forma, infinitivo, separación, tipo de cambio
+ ['quiero','querer','quier-o','raiz'],['pienso','pensar','piens-o','raiz'],['duermo','dormir','duerm-o','raiz'],['juego','jugar','jueg-o','raiz'],['pido','pedir','pid-o','raiz'],
+ ['vuelvo','volver','vuelv-o','raiz'],['tengo','tener','teng-o','raiz'],['conduzco','conducir','conduzc-o','raiz'],['quepo','caber','quep-o','raiz'],['salgo','salir','salg-o','raiz'],
+ ['pongo','poner','pong-o','raiz'],['hago','hacer','hag-o','raiz'],['tendré','tener','tendr-é','raiz'],['saldré','salir','saldr-é','raiz'],['pondré','poner','pondr-é','raiz'],
+ ['querré','querer','querr-é','raiz'],['sabré','saber','sabr-é','raiz'],['haré','hacer','har-é','raiz'],
+ ['anduvo','andar','and-uvo','des'],['anduvimos','andar','and-uvimos','des'],['estuvo','estar','est-uvo','des'],['estuve','estar','est-uve','des'],['estoy','estar','est-oy','des'],['doy','dar','d-oy','des'],
+ ['era','ser','era','ambas'],['fui','ir','fui','ambas'],['hizo','hacer','hiz-o','ambas'],['tuvo','tener','tuv-o','ambas'],['puso','poner','pus-o','ambas'],['supo','saber','sup-o','ambas'],
+ ['vino','venir','vin-o','ambas'],['cupo','caber','cup-o','ambas'],['pudo','poder','pud-o','ambas']];
+const CAMBIO_LAB = {raiz:'En la raíz', des:'En la desinencia', ambas:'En la raíz y la desinencia'};
+const TIPOS_EXP = 'Regulares: mantienen la raíz de su infinitivo y las desinencias de su conjugación (salt-ar, salt-ó). Irregulares: tienen cambios en la raíz (dij-o), en la desinencia (and-uvo) o en las dos (era).';
+function qRegIrr(){
+  const irr=Math.random()<.5, v=irr?pick(IRR.filter(x=>!['ser','ir'].includes(x.inf))):pick(REG_SIMPLE);
+  const f=['pres','pps','fut'].map(t=>conj(v,t)[0]);
+  return {tipo:'test', tema:'Regulares e irregulares', enun:`El verbo «${v.inf}», ¿es regular o irregular?`, sub:'Truco: conjúgalo en presente, pretérito perfecto simple y futuro (yo…)', opciones:['Regular','Irregular'], resp:irr?'Irregular':'Regular',
+    exp:`yo ${f.join(', yo ')}. ${irr?'Cambia la raíz o las desinencias: es irregular.':'Mantiene la raíz y las desinencias de su conjugación: es regular.'}`};
+}
+function qCambio(){
+  const [f,inf,sep,k]=pick(CAMBIOS);
+  return {tipo:'test', tema:'Regulares e irregulares', enun:`¿Dónde está el cambio irregular de «${f}» (${inf})?`, sub:`Se separa así: ${sep}`, opciones:Object.values(CAMBIO_LAB), resp:CAMBIO_LAB[k],
+    exp:`${CAMBIO_LAB[k]}. Raíz de ${inf}: ${inf.slice(0,-2)}-. ${TIPOS_EXP}`};
+}
+function qTiemposTruco(){
+  const ok='Presente, pretérito perfecto simple y futuro simple';
+  return {tipo:'test', tema:'Regulares e irregulares', enun:'Para saber si un verbo es irregular, ¿en qué tiempos hay que conjugarlo?', opciones:shuffle([ok,'Presente, pretérito imperfecto y condicional','Solo en el infinitivo','Pretérito perfecto compuesto y pluscuamperfecto']), resp:ok,
+    exp:'En presente, pretérito perfecto simple y futuro simple es donde aparecen más cambios en la raíz y las desinencias.'};
+}
+const DEFECT = {
+  met:['Fenómeno natural o meteorológico','Solo tienen formas de 3ª persona del singular: llovía, ha nevado, atardece.'],
+  hec:['Se refiere a hechos','Se usan solo en 3ª persona del singular y del plural: ha pasado, ocurrirán, habían sucedido.'],
+  hab:['Haber cuando no es auxiliar','Solo se conjuga en 3ª persona del singular: hay, había, habrá, ha habido.'],
+  sol:['El verbo soler','Solo se conjuga en presente y pretérito imperfecto de indicativo y de subjuntivo: suelo, solíais, soliéramos.'],
+};
+const DEF_VERBOS = [['llover','met'],['nevar','met'],['atardecer','met'],['amanecer','met'],['granizar','met'],['tronar','met'],['anochecer','met'],['relampaguear','met'],
+ ['ocurrir','hec'],['suceder','hec'],['pasar (un hecho)','hec'],['acontecer','hec'],['soler','sol']];
+const DEF_FRASES = [['Había muchos niños en el parque.','Habían muchos niños en el parque.','hab'],['Hubo tres heridos en el accidente.','Hubieron tres heridos en el accidente.','hab'],
+ ['Mañana habrá fiestas en el pueblo.','Mañana habrán fiestas en el pueblo.','hab'],['Ha habido muchos problemas.','Han habido muchos problemas.','hab'],
+ ['Habría más sitio si nos movemos.','Habrían más sitio si nos movemos.','hab'],['Suelo leer antes de dormir.','Soleré leer antes de dormir.','sol'],
+ ['De pequeño solía ir al pueblo.','De pequeño solí ir al pueblo.','sol'],['Ayer nevó en la sierra.','Ayer nevaron en la sierra.','met'],
+ ['Anoche llovió mucho.','Anoche llovimos mucho.','met'],['Estas cosas suceden a menudo.','Estas cosas sucedo a menudo.','hec'],['Los hechos ocurrieron en 1492.','Los hechos ocurrimos en 1492.','hec']];
+function qDefTipo(){
+  const [v,k]=pick(DEF_VERBOS);
+  return {tipo:'test', tema:'Verbos defectivos', enun:`«${v}» es un verbo defectivo. ¿De qué tipo?`, opciones:Object.values(DEFECT).map(x=>x[0]), resp:DEFECT[k][0], exp:`${DEFECT[k][0]}. ${DEFECT[k][1]}`};
+}
+function qDefFrase(){
+  const [ok,mal,k]=pick(DEF_FRASES);
+  return {tipo:'test', tema:'Verbos defectivos', enun:'¿Qué frase es correcta?', opciones:shuffle([ok,mal]), resp:ok, exp:`${DEFECT[k][0]}: ${DEFECT[k][1].charAt(0).toLowerCase()+DEFECT[k][1].slice(1)}`};
+}
+function qDefRegla(){
+  const k=pick(Object.keys(DEFECT));
+  const reglas={met:'Solo 3ª persona del singular', hec:'Solo 3ª persona del singular y del plural', hab:'Solo 3ª persona del singular', sol:'Solo presente y pretérito imperfecto (indicativo y subjuntivo)'};
+  const op=uniq(['Solo 3ª persona del singular','Solo 3ª persona del singular y del plural','Solo presente y pretérito imperfecto (indicativo y subjuntivo)','Todas las personas y tiempos']);
+  return {tipo:'test', tema:'Verbos defectivos', enun:`${DEFECT[k][0]}: ¿qué formas tiene?`, opciones:op, resp:reglas[k], exp:`Los verbos defectivos no tienen todas las formas de su conjugación. ${DEFECT[k][1]}`};
+}
+
+
+/* ============ FAMILIAS Y CAMPOS SEMÁNTICOS ============ */
+const FAMILIAS = [
+ ['noche','noche anoche anochecer medianoche nocturno','nota nocivo'],['pan','pan panadero panadería empanada panecillo','pantalón pantano'],
+ ['flor','flor florero floristería florecer floral','flota flojo'],['mar','mar marino marinero marea submarino','martillo marcar'],
+ ['tierra','tierra terrestre enterrar terreno aterrizar','tierno tiesto'],['casa','casa caseta casero casita caserío','casco cascada'],
+ ['zapato','zapato zapatero zapatería zapatilla','zarpa zapallo'],['libro','libro librería librero libreta','libre liebre'],
+ ['sol','sol solar soleado parasol girasol','soldado soltar'],['mano','mano manual manopla manosear','manzana manta'],
+ ['pesca','pesca pescador pescadería pescado','pesadilla peso'],['jardín','jardín jardinero jardinería','jarra jarabe'],
+ ['frío','frío enfriar resfriado friolero','frito fresa'],['hoja','hoja hojear hojarasca deshojar','hora hoyo'],['papel','papel papelera papelería empapelar','papilla papá']];
+const CAMPOS = [['momentos del día','mañana tarde noche mediodía madrugada amanecer'],['frutas','manzana pera plátano naranja uva fresa'],
+ ['deportes','fútbol tenis baloncesto natación balonmano atletismo'],['instrumentos musicales','guitarra piano violín flauta tambor trompeta'],
+ ['profesiones','médico bombero maestro carpintero piloto fontanero'],['medios de transporte','coche tren avión barco bicicleta autobús'],
+ ['partes del cuerpo','cabeza brazo pierna rodilla codo hombro'],['colores','rojo azul verde amarillo morado blanco'],
+ ['tiempo atmosférico','lluvia nieve viento tormenta granizo niebla'],['muebles','mesa silla sofá armario cama estantería'],['animales de granja','vaca cerdo gallina oveja caballo cabra']];
+const FAM = FAMILIAS.map(([r,p,f])=>({r, p:p.split(' '), f:f.split(' ')}));
+const CAM = CAMPOS.map(([n,p])=>({n, p:p.split(' ')}));
+const VOC_EXP = 'Familia de palabras: palabras con la misma raíz (noche, anoche, anochecer, medianoche). Campo semántico: palabras con una parte de su significado en común (mañana, tarde, noche: momentos del día).';
+function qFamIntrusa(){
+  const F=pick(FAM), tres=shuffle(F.p).slice(0,3), intr=pick(F.f);
+  return {tipo:'test', tema:'Familias de palabras', enun:`¿Qué palabra NO es de la familia de «${F.r}»?`, sub:'Fíjate en la raíz, no solo en las letras', opciones:shuffle([...tres,intr]), resp:intr,
+    exp:`«${intr}» se parece, pero no tiene la raíz «${F.r}» ni su significado. Familia de «${F.r}»: ${F.p.join(', ')}.`};
+}
+function qFamCual(){
+  const F=pick(FAM), ok=pick(F.p.filter(x=>x!==F.r)), otras=shuffle(FAM.filter(x=>x!==F)).slice(0,3).map(x=>pick(x.p));
+  return {tipo:'test', tema:'Familias de palabras', enun:`¿Qué palabra pertenece a la familia de «${F.r}»?`, opciones:shuffle([ok,...otras]), resp:ok, exp:`Familia de «${F.r}»: ${F.p.join(', ')}. Todas comparten la raíz.`};
+}
+function qCampoNombre(){
+  const C=pick(CAM), otros=shuffle(CAM.filter(x=>x!==C)).slice(0,3).map(x=>x.n);
+  return {tipo:'test', tema:'Campos semánticos', enun:'¿Qué campo semántico forman estas palabras?', frase:esc(shuffle(C.p).slice(0,4).join(', ')), opciones:shuffle([C.n,...otros]), resp:C.n,
+    exp:`Son ${C.n}: ${C.p.join(', ')}. Comparten una parte de su significado, no la raíz.`};
+}
+function qCampoIntruso(){
+  const C=pick(CAM), tres=shuffle(C.p).slice(0,3), O=pick(CAM.filter(x=>x!==C)), intr=pick(O.p);
+  return {tipo:'test', tema:'Campos semánticos', enun:`¿Qué palabra no pertenece al campo semántico «${C.n}»?`, opciones:shuffle([...tres,intr]), resp:intr,
+    exp:`«${intr}» pertenece a otro campo semántico (${O.n}). ${C.n}: ${C.p.join(', ')}.`};
+}
+function qFamOCampo(){
+  const fam=Math.random()<.5, lista = fam ? shuffle(pick(FAM).p).slice(0,4) : shuffle(pick(CAM).p).slice(0,4);
+  return {tipo:'test', tema:'Familia o campo', enun:'Estas palabras forman…', frase:esc(lista.join(', ')), opciones:['Una familia de palabras','Un campo semántico'], resp: fam?'Una familia de palabras':'Un campo semántico', exp:VOC_EXP};
+}
+function qVocVF(){
+  const L=[['Una familia de palabras es un conjunto de palabras con la misma raíz.',true],['Un campo semántico es un conjunto de palabras con la misma raíz.',false],
+   ['Las palabras de un campo semántico tienen una parte de su significado en común.',true],['«Mañana, tarde y noche» forman una familia de palabras.',false],
+   ['«Noche, anoche y anochecer» forman una familia de palabras.',true],['Las palabras se agrupan según su forma en campos semánticos.',false],
+   ['Las palabras se agrupan según su forma en familias de palabras.',true],['«Pantalón» es de la familia de «pan».',false],['«Soldado» es de la familia de «sol».',false],['«Girasol» es de la familia de «sol».',true]];
+  const [f,r]=pick(L); return {tipo:'vf', tema:'Familia o campo', enun:f, resp:r, exp:VOC_EXP};
+}
+
 /* ============ MUNDOS Y NIVELES ============ */
 function mix(list){ const tot=list.reduce((a,x)=>a+x[0],0); let r=Math.random()*tot; for(const [w,f] of list){ if((r-=w)<0) return f(); } return list[0][1](); }
 const MUNDOS = [
@@ -973,6 +1078,16 @@ const MUNDOS = [
    {n:'Presente y pasado', d:'Yo quepo, él anduvo, nosotros hicimos', g:()=>mix([[4,()=>qIrrTest(['pres','pps'])],[1,()=>qIrrEscribir(['pres','pps'])]])},
    {n:'Futuro y participios', d:'Tendré, cabría, he puesto, he roto', g:()=>mix([[3,()=>qIrrTest(['pres','pps','fut','cond','impf'])],[2,()=>qIrrEscribir(['pres','pps','fut','cond'])],[2,()=>qPart(false)],[1,()=>qPart(true)]])},
    {n:'Subjuntivo y compuestos', d:'Que yo quepa, si tuviera, habíamos dicho', g:()=>mix([[3,()=>qIrrTest(['spres','simpf','ppc','plus','futc','condc'])],[3,()=>qIrrEscribir(['spres','simpf','ppc','plus'])],[1,()=>qPart(true)]])},
+ ]},
+ {id:'tiposverbo', nombre:'Tipos de verbos', desc:'Regulares, irregulares y defectivos', col:'--c12', ico:'V', niveles:[
+   {n:'¿Regular o irregular?', d:'Salt-ó / and-uvo', g:()=>mix([[4,()=>qRegIrr()],[1,()=>qTiemposTruco()],[2,()=>qRaiz()]])},
+   {n:'¿Dónde cambia?', d:'En la raíz, la desinencia o las dos', g:()=>mix([[5,()=>qCambio()],[2,()=>qRegIrr()]])},
+   {n:'Verbos defectivos', d:'Llueve, ocurre, hay, suelo', g:()=>mix([[3,()=>qDefFrase()],[3,()=>qDefTipo()],[2,()=>qDefRegla()]])},
+ ]},
+ {id:'vocabulario', nombre:'Vocabulario', desc:'Familias de palabras y campos semánticos', col:'--c13', ico:'W', niveles:[
+   {n:'Familias de palabras', d:'Noche, anoche, anochecer…', g:()=>mix([[3,()=>qFamIntrusa()],[3,()=>qFamCual()],[1,()=>qVocVF()]])},
+   {n:'Campos semánticos', d:'Mañana, tarde, noche: momentos del día', g:()=>mix([[3,()=>qCampoNombre()],[3,()=>qCampoIntruso()],[1,()=>qVocVF()]])},
+   {n:'¿Familia o campo?', d:'Forma o significado', g:()=>mix([[3,()=>qFamOCampo()],[2,()=>qVocVF()],[2,()=>qFamIntrusa()],[2,()=>qCampoIntruso()]])},
  ]},
  {id:'determinantes', nombre:'Determinantes', desc:'Artículos, demostrativos, posesivos…', col:'--c3', ico:'D', niveles:[
    {n:'Artículos, demostrativos y posesivos', d:'El, este, mi…', g:()=>mix([[4,()=>qDetClase(['art','dem','pos'])],[2,()=>qDetTocar(['art','dem','pos'])],[2,()=>qDetSub()]])},
@@ -1235,6 +1350,16 @@ function vTeoria(mi){
     <h3>Imperativos irregulares (tú)</h3>${tb(['tener','hacer','decir','poner'])}${tb(['venir','salir','ser','ir'])}
     <h3>Formas no personales</h3><p>No indican persona ni número.</p><div class="tbl"><table><thead><tr><th></th><th>amar</th><th>comer</th><th>vivir</th></tr></thead><tbody>
     ${FNP.map((n,i)=>`<tr><th>${n}</th>${['amar','comer','vivir'].map(x=>{const v=VERBO[x]; return `<td>${[v.inf,gerundio(v),part(v),'haber '+part(v),'habiendo '+part(v)][i]}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`; }
+  if(m.id==='vocabulario') h = `<p>Las palabras se agrupan de dos maneras:</p><div class="tgrid">
+    <div class="tbox"><b>Según su forma: familias de palabras</b><p style="margin:4px 0 0">Conjunto de palabras que tienen la misma raíz: <i>noche, anoche, anochecer, medianoche…</i></p></div>
+    <div class="tbox"><b>Según su significado: campos semánticos</b><p style="margin:4px 0 0">Conjunto de palabras que tienen una parte de su significado en común: <i>mañana, tarde, noche…</i> (momentos del día).</p></div></div>
+    <h3>Ojo con las trampas</h3><p>Que dos palabras se parezcan no significa que sean de la misma familia: <b>pan</b> → panadero ✔, <s>pantalón</s> ✘; <b>sol</b> → girasol ✔, <s>soldado</s> ✘. Tienen que compartir raíz <b>y</b> significado.</p>`;
+  if(m.id==='tiposverbo') h = `<p>Los <b>verbos</b> expresan acciones o estados. Se nombran con el <b>infinitivo</b> y, según cómo termine, son de la 1ª (reg-ar), 2ª (crec-er) o 3ª conjugación (reduc-ir). La <b>raíz</b> aporta el significado y las <b>desinencias</b> indican persona, número, tiempo y modo.</p>
+    <h3>Regulares e irregulares</h3><p><b>Regulares:</b> mantienen la misma raíz que su infinitivo (salt-ar, salt-ó) y las desinencias de su conjugación (salt-a, planch-a).</p>
+    <div class="tbl"><table><thead><tr><th>Cambio en la raíz</th><th>En la desinencia</th><th>En la raíz y la desinencia</th></tr></thead><tbody><tr><td>dij-o (decir)</td><td>and-uvo (cantó)</td><td>era (ser, bebía)</td></tr></tbody></table></div>
+    <p>Para saber si un verbo es irregular hay que conjugarlo en <b>presente, pretérito perfecto simple y futuro simple</b>.</p>
+    <h3>Verbos defectivos</h3><p>No tienen todas las formas de su conjugación.</p><div class="tgrid">${Object.values(DEFECT).map(x=>`<div class="tbox"><b>${x[0]}</b><p style="margin:4px 0 0">${x[1]}</p></div>`).join('')}</div>
+    <p>Error típico: <s>habían muchos niños</s> → <b>había muchos niños</b>; <s>hubieron heridos</s> → <b>hubo heridos</b>.</p>`;
   if(m.id==='signos') h = `<p>El <b>punto y coma</b> indica una pausa más larga que la coma y un poco más corta que el punto.</p>` + Object.keys(SIG).map(k=>`<h3>${SIG[k].n}</h3><ul>${Object.keys(USOS).filter(u=>USOS[u][0]===k).map(u=>`<li>${USOS[u][1]}: <i>${esc(SIG_EJ.find(x=>x[0]===u)[1])}</i></li>`).join('')}</ul>`).join('');
   if(m.id==='letras') h = [['h','Palabras con h'],['x','Se escriben con x'],['s','Se escriben con s'],['g','Se escriben con g'],['j','Se escriben con j']].map(([l,t])=>`<h3>${t}</h3><ul>${Object.keys(REGLAS).filter(k=>k[0]===l).map(k=>`<li>${REGLAS[k][1]}</li>`).join('')}</ul>`).join('');
   if(m.id==='ortografia') h = `<h3>Palabras compuestas</h3><p>Se forman a partir de la unión de dos o más palabras simples: <i>sacapuntas, girasol</i>. Se acentúan siguiendo las <b>reglas generales de acentuación</b>, ya que se consideran una sola palabra: <i>hidroavión, undécimo</i>. Al unirse pueden sufrir algún cambio ortográfico: cien + pies → <b>ciempiés</b>.</p>
