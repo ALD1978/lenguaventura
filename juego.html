@@ -39,7 +39,9 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid 
 /* Cabecera */
 .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
 .who{display:flex;align-items:center;gap:10px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:4px 16px 4px 4px;font-weight:800}
-.ava{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--surface2)}
+.ava{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:26px;background:var(--surface2);overflow:hidden}
+.ava svg,.avs svg{width:100%;height:100%;display:block}
+.mini{display:inline-block;width:24px;height:24px;vertical-align:middle}.mini svg{width:100%;height:100%}
 .chips{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:800;font-variant-numeric:tabular-nums}
 .coin{width:18px;height:18px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#FFE38A,#F2A900 70%);box-shadow:inset 0 -2px 0 #C98500}
@@ -1018,12 +1020,18 @@ const MUNDOS = [
 
 /* ============ ESTADO ============ */
 const KEY='lenguaventura.v1';
-const AVATARES=['🦊','🦉','🐼','🐯','🐸','🦖','🐙','🐬','🦁','🐨','🐺','🦄'];
+const AV_SVG = {
+  collie:`<svg viewBox="0 0 100 100" aria-label="Border collie"><path d="M22 46 Q12 26 22 14 Q38 18 44 30Z" fill="#1d1d1f"/><path d="M78 46 Q88 26 78 14 Q62 18 56 30Z" fill="#1d1d1f"/><path d="M22 14 Q30 15 33 22 Q24 26 18 24Z" fill="#3a3a3f"/><path d="M78 14 Q70 15 67 22 Q76 26 82 24Z" fill="#3a3a3f"/><path d="M26 84 Q50 100 74 84 L70 74 Q50 86 30 74Z" fill="#fff"/><ellipse cx="50" cy="53" rx="32" ry="31" fill="#1d1d1f"/><path d="M50 21 C44 30 42 42 39 58 L61 58 C58 42 56 30 50 21Z" fill="#fff"/><ellipse cx="50" cy="69" rx="21" ry="16" fill="#fff"/><circle cx="36" cy="48" r="5" fill="#7a4a22"/><circle cx="64" cy="48" r="5" fill="#7a4a22"/><circle cx="37.5" cy="46.5" r="1.7" fill="#fff"/><circle cx="65.5" cy="46.5" r="1.7" fill="#fff"/><ellipse cx="50" cy="62" rx="6.5" ry="4.8" fill="#111"/><path d="M50 66v5M43 72q7 5 14 0" stroke="#111" stroke-width="2.2" fill="none" stroke-linecap="round"/><path d="M46.5 74.5q3.5 9 7 0z" fill="#ef6f8f"/></svg>`,
+  boxer:`<svg viewBox="0 0 100 100" aria-label="Bóxer"><path d="M24 26 Q8 40 20 58 L34 34Z" fill="#8a4b20"/><path d="M76 26 Q92 40 80 58 L66 34Z" fill="#8a4b20"/><ellipse cx="50" cy="51" rx="31" ry="33" fill="#c8813e"/><path d="M41 29q9-5 18 0M43 34q7-3 14 0" stroke="#9c5a24" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M50 22 C47 32 46 40 46 50 L54 50 C54 40 53 32 50 22Z" fill="#fff"/><path d="M27 62 C27 51 38 48 50 48 C62 48 73 51 73 62 C73 78 63 86 50 86 C37 86 27 78 27 62Z" fill="#2b2220"/><path d="M42 80q8 5 16 0l-2 5q-6 3-12 0z" fill="#fff"/><circle cx="37" cy="44" r="4.5" fill="#3b2314"/><circle cx="63" cy="44" r="4.5" fill="#3b2314"/><circle cx="38.3" cy="42.7" r="1.5" fill="#fff"/><circle cx="64.3" cy="42.7" r="1.5" fill="#fff"/><ellipse cx="50" cy="57" rx="7.5" ry="5" fill="#0d0b0a"/><ellipse cx="48" cy="55.5" rx="2" ry="1.2" fill="#555"/><path d="M50 62v5M39 69q11 7 22 0" stroke="#000" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>`,
+};
+const avaHTML = a => AV_SVG[a] || esc(a);
+const AVATARES=['collie','boxer','🦊','🦉','🐼','🐯','🐸','🦖','🐙','🐬','🦁','🐨'];
 const perfilNuevo = (nombre, avatar) => ({nombre, avatar, monedas:0, niveles:{}, stats:{}, temas:{}, fallos:[], rachaMax:0, crono:0, sesiones:[]});
 let S;
 function cargar(){
   try{ S = JSON.parse(localStorage.getItem(KEY)); }catch(e){ S=null; }
-  if(!S || !S.perfiles) S = {actual:null, sonido:true, perfiles:{sergio:perfilNuevo('Sergio','🦊'), elena:perfilNuevo('Elena','🦉')}};
+  if(!S || !S.perfiles) S = {actual:null, sonido:true, perfiles:{sergio:perfilNuevo('Sergio','collie'), elena:perfilNuevo('Elena','boxer')}};
+  if(!S.avPerros){ S.perfiles.sergio.avatar='collie'; S.perfiles.elena.avatar='boxer'; S.avPerros=true; }
 }
 function guardar(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
 const P = () => S.perfiles[S.actual];
@@ -1056,7 +1064,7 @@ const app = $('#app');
 function cabecera(){
   const p=P();
   return `<div class="top">
-    <button class="who" data-go="perfil" aria-label="Cambiar jugador"><span class="ava">${p.avatar}</span>${esc(p.nombre)}</button>
+    <button class="who" data-go="perfil" aria-label="Cambiar jugador"><span class="ava">${avaHTML(p.avatar)}</span>${esc(p.nombre)}</button>
     <div class="chips">
       <span class="chip" title="Monedas"><span class="coin"></span>${p.monedas}</span>
       <span class="chip" title="Mejor racha">🔥 ${p.rachaMax}</span>
@@ -1065,7 +1073,7 @@ function cabecera(){
 }
 function vPerfiles(){
   app.innerHTML = `<div class="hero"><img class="logo" src="logo.jpg" alt="Lenguaventura, 6º de Primaria" width="512" height="512"><div><h1>Lengua<span>ventura</span></h1><p>Lengua de 6º jugando. ¿Quién juega?</p></div></div>
-  <div class="pick">${Object.entries(S.perfiles).map(([id,p])=>`<button class="pcard" data-perfil="${id}"><span class="ava">${p.avatar}</span>${esc(p.nombre)}<small class="muted" style="font-family:var(--body);font-size:15px">${p.monedas} monedas</small></button>`).join('')}</div>`;
+  <div class="pick">${Object.entries(S.perfiles).map(([id,p])=>`<button class="pcard" data-perfil="${id}"><span class="ava">${avaHTML(p.avatar)}</span>${esc(p.nombre)}<small class="muted" style="font-family:var(--body);font-size:15px">${p.monedas} monedas</small></button>`).join('')}</div>`;
 }
 function vMapa(){
   const p=P();
@@ -1254,12 +1262,12 @@ function vFamilia(){
     return `<div class="bar"><b>${m.nombre}</b><div class="tr"><i style="width:${pc}%;background:var(${m.col})"></i></div><span>${n?pc+'%':'—'}</span></div>`; }).join('');
   const temas = Object.entries(p.temas).filter(([,s])=>s.ok+s.ko>=3).map(([t,s])=>[t,s.ok/(s.ok+s.ko),s.ok+s.ko]).sort((a,b)=>a[1]-b[1]).slice(0,6);
   app.innerHTML = cabecera() + `<div class="card"><div class="gbar"><button class="x" data-go="mapa" aria-label="Volver">←</button><h2 style="margin:0">Zona familia</h2></div>
-    <div class="tabs">${Object.entries(S.perfiles).map(([id,pp])=>`<button data-tab="${id}" aria-pressed="${id===famTab}">${pp.avatar} ${esc(pp.nombre)}</button>`).join('')}</div>
+    <div class="tabs">${Object.entries(S.perfiles).map(([id,pp])=>`<button data-tab="${id}" aria-pressed="${id===famTab}"><span class="mini">${avaHTML(pp.avatar)}</span> ${esc(pp.nombre)}</button>`).join('')}</div>
     <p class="muted">El progreso se guarda en esta tablet. ${esc(p.nombre)} tiene ${p.monedas} monedas, mejor racha ${p.rachaMax} y récord de contrarreloj ${p.crono}.</p>
     <h3>Aciertos por mundo</h3><div class="bars">${barras}</div>
     <h3 style="margin-top:18px">Lo que más le cuesta</h3>${temas.length?`<ul class="list">${temas.map(([t,r,n])=>`<li><span>${esc(t)}</span><b>${Math.round(r*100)}% de ${n}</b></li>`).join('')}</ul>`:'<p class="muted">Todavía hay pocos datos.</p>'}
     <h3 style="margin-top:18px">Últimas partidas</h3>${p.sesiones.length?`<ul class="list">${p.sesiones.slice(0,8).map(s=>`<li><span>${new Date(s.f).toLocaleDateString('es-ES',{day:'numeric',month:'short'})} · ${esc(s.m)}</span><b>${s.ok}${s.tot?' / '+s.tot:' aciertos'}</b></li>`).join('')}</ul>`:'<p class="muted">Aún no ha jugado.</p>'}
-    <h3 style="margin-top:18px">Avatar</h3><div class="avs">${AVATARES.map(a=>`<button data-av="${a}" aria-pressed="${a===p.avatar}">${a}</button>`).join('')}</div>
+    <h3 style="margin-top:18px">Avatar</h3><div class="avs">${AVATARES.map(a=>`<button data-av="${a}" aria-pressed="${a===p.avatar}">${avaHTML(a)}</button>`).join('')}</div>
     <h3 style="margin-top:18px">Ajustes</h3>
     <div class="row" style="justify-content:flex-start"><button class="btn sec sm" data-go="borrar">Borrar progreso de ${esc(p.nombre)}</button></div>
     ${borrar?`<div class="confirm"><span>¿Seguro? Se borrarán estrellas, monedas y estadísticas de ${esc(p.nombre)}.</span><button class="btn sm" data-go="borrarsi">Sí, borrar</button><button class="btn sec sm" data-go="borrarno">Cancelar</button></div>`:''}
