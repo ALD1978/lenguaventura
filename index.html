@@ -12,7 +12,7 @@
 :root{
   --bg:#EEF2FB; --surface:#FFFFFF; --surface2:#F5F7FD; --ink:#1B2545; --muted:#5D6787; --line:#D9DFEF;
   --accent:#FF6B35; --accent-ink:#FFFFFF;
-  --c1:#3767F0; --c2:#E0457B; --c3:#14A06C; --c4:#E59A00; --c5:#7B5CF0; --c6:#0E8F9B; --c7:#9A5B22; --c8:#B0388F; --c9:#C2410C; --c10:#4D7C0F; --c11:#BE123C; --c12:#0369A1; --c13:#9333EA;
+  --c1:#3767F0; --c2:#E0457B; --c3:#14A06C; --c4:#E59A00; --c5:#7B5CF0; --c6:#0E8F9B; --c7:#9A5B22; --c8:#B0388F; --c9:#C2410C; --c10:#4D7C0F; --c11:#BE123C; --c12:#0369A1; --c13:#9333EA; --c14:#0F766E;
   --ok:#139A52; --ok-bg:#DDF5E7; --ko:#D23F3F; --ko-bg:#FBE1E1; --star:#FFB400;
   --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
   --body:"Nunito","Segoe UI",system-ui,sans-serif;
@@ -21,12 +21,12 @@
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#111729; --surface:#1B2340; --surface2:#222C4E; --ink:#E9EDFF; --muted:#A3ADD0; --line:#2F3A63;
   --accent:#FF8350; --accent-ink:#1B1200;
-  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185; --c12:#38BDF8; --c13:#C084FC;
+  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185; --c12:#38BDF8; --c13:#C084FC; --c14:#2DD4BF;
   --ok:#4BD98A; --ok-bg:#183C2B; --ko:#FF7B7B; --ko-bg:#4A2026; --star:#FFC83D; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#111729; --surface:#1B2340; --surface2:#222C4E; --ink:#E9EDFF; --muted:#A3ADD0; --line:#2F3A63;
   --accent:#FF8350; --accent-ink:#1B1200;
-  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185; --c12:#38BDF8; --c13:#C084FC;
+  --c1:#6E92FF; --c2:#FF6E9F; --c3:#3FCB93; --c4:#FFBE3B; --c5:#A48CFF; --c6:#3CC6D2; --c7:#E0A462; --c8:#F07BCB; --c9:#FB923C; --c10:#A3E635; --c11:#FB7185; --c12:#38BDF8; --c13:#C084FC; --c14:#2DD4BF;
   --ok:#4BD98A; --ok-bg:#183C2B; --ko:#FF7B7B; --ko-bg:#4A2026; --star:#FFC83D; color-scheme:dark}
 *{box-sizing:border-box}
 html,body{height:100%}
@@ -1072,6 +1072,90 @@ function qVocVF(){
   const [f,r]=pick(L); return {tipo:'vf', tema:'Familia o campo', enun:f, resp:r, exp:VOC_EXP};
 }
 
+
+/* ============ ANÁLISIS DE VERBOS EN UN TEXTO ============ */
+// {forma|infinitivo|tiempo o inf/ger/part|persona 0-5}
+const AV_SRC = [
+ 'Cada verano, Lucas {visita|visitar|pres|2} a sus abuelos en un pequeño pueblo de la costa.',
+ 'Desde su ventana, siempre {observa|observar|pres|2} la luz del antiguo faro que {ilumina|iluminar|pres|2} el mar por las noches.',
+ 'Cuando {era|ser|impf|2} pequeño, su abuelo le {contaba|contar|impf|2} historias increíbles sobre barcos piratas.',
+ 'El año pasado, ambos {subieron|subir|pps|5} hasta la torre más alta y {descubrieron|descubrir|pps|5} un viejo mapa {escondido|esconder|part} dentro de un baúl.',
+ 'Mañana mismo, Lucas {empezará|empezar|fut|2} una nueva búsqueda por los acantilados junto a su perro Toby.',
+ 'Si {encontrara|encontrar|simpf|2} el tesoro {perdido|perder|part} del capitán, {compraría|comprar|cond|2} un barco enorme para {navegar|navegar|inf} por todo el mundo.',
+ 'Ayer {llovió|llover|pps|2} toda la tarde y mis primos {vinieron|venir|pps|5} a casa.',
+ 'Mi hermana ya {ha terminado|terminar|ppc|2} los deberes, pero yo todavía {estoy|estar|pres|0} {leyendo|leer|ger} el libro.',
+ 'Cuando {llegaron|llegar|pps|5} a la estación, el tren ya {había salido|salir|plus|2}.',
+ 'El próximo verano {habremos terminado|terminar|futc|3} el colegio y {viajaremos|viajar|fut|3} a Italia.',
+ 'Si {tuviera|tener|simpf|0} tiempo, {aprendería|aprender|cond|0} a {tocar|tocar|inf} la guitarra.',
+ 'Mis abuelos {vivían|vivir|impf|5} en el campo y {cultivaban|cultivar|impf|5} tomates.',
+ 'Os {he dicho|decir|ppc|0} mil veces que {recojáis|recoger|spres|4} la habitación.',
+ 'Mañana {iremos|ir|fut|3} al museo y {veremos|ver|fut|3} cuadros de Velázquez.',
+ 'Con un gol más, nosotros {habríamos ganado|ganar|condc|3} el partido.',
+ 'En cuanto {hubo terminado|terminar|pant|2} la cena, {salió|salir|pps|2} a {pasear|pasear|inf}.',
+ '¿{Habéis visto|ver|ppc|4} mi mochila? La {dejé|dejar|pps|0} aquí hace un rato.',
+ 'Ojalá {haga|hacer|spres|2} sol el sábado, porque {queremos|querer|pres|3} ir a la playa.',
+ 'Tú siempre {corres|correr|pres|1} muy deprisa cuando {juegas|jugar|pres|1} al fútbol.',
+ 'Los niños {estaban|estar|impf|5} {cantando|cantar|ger} cuando {sonó|sonar|pps|2} el timbre.',
+];
+const FNP_LAB = {inf:'infinitivo', ger:'gerundio', part:'participio'};
+function parseAV(src){
+  const out=[], re=/\{([^}]+)\}|(\s+)|([\p{L}]+)|([^\s\p{L}{]+)/gu; let m;
+  while((m=re.exec(src))){
+    if(m[1]){ const [t,inf,c,pp]=m[1].split('|'); out.push({t, inf, c, p: pp===undefined?null:+pp, v:true}); }
+    else if(m[2]) out.push({sp:true}); else if(m[3]) out.push({t:m[3]}); else out.push({t:m[4], pu:true});
+  }
+  return out;
+}
+const AVS = AV_SRC.map(parseAV);
+const esFNP = k => !!FNP_LAB[k.c];
+const conjN = inf => ['1ª conjugación (-ar)','2ª conjugación (-er)','3ª conjugación (-ir)'][grupo(inf)];
+function avDesc(k){
+  if(esFNP(k)) return `«${k.t}»: forma no personal (${FNP_LAB[k.c]}) del verbo ${k.inf}, ${conjN(k.inf)}.`;
+  const t=TI[k.c];
+  return `«${k.t}»: verbo ${k.inf}, ${conjN(k.inf)}; ${PERS[k.p].lab}; ${tLab(t).toLowerCase()}; tiempo ${t.aux?'compuesto':'simple'}.`;
+}
+function elegirAV(filtro){
+  const c=[]; AVS.forEach((s,si)=>s.forEach((k,ki)=>{ if(k.v && filtro(k)) c.push([si,ki]); }));
+  const [si,ki]=pick(c); return {s:AVS[si], i:ki, k:AVS[si][ki]};
+}
+function qAVTocar(){
+  let s; do { s=pick(AVS); } while(!s.some(k=>k.v && !esFNP(k) && TI[k.c].m==='ind'));
+  const toks=s.map(k=>({t:k.t, sp:k.sp, pu:k.pu, ok:!!(k.v && !esFNP(k) && TI[k.c].m==='ind')}));
+  const otros=s.filter(k=>k.v && !(TI[k.c] && TI[k.c].m==='ind'));
+  return {tipo:'tocar', tema:'Análisis de verbos', enun:'Toca un verbo en modo indicativo', sub:'Cuidado: no todos los verbos están en indicativo', toks,
+    exp:`En indicativo: ${s.filter(k=>k.v&&!esFNP(k)&&TI[k.c].m==='ind').map(k=>'«'+k.t+'»').join(', ')}.${otros.length?' No lo están: '+otros.map(k=>'«'+k.t+'» ('+(esFNP(k)?FNP_LAB[k.c]:'subjuntivo')+')').join(', ')+'.':''}`};
+}
+function qAVModo(){
+  const {s,i,k}=elegirAV(()=>true);
+  const ok = esFNP(k) ? 'Forma no personal' : TI[k.c].m==='ind' ? 'Indicativo' : 'Subjuntivo';
+  return {tipo:'test', tema:'Análisis de verbos', enun:'La forma verbal marcada está en…', frase:fraseAV(s,i), opciones:['Indicativo','Subjuntivo','Forma no personal'], resp:ok, exp:avDesc(k)};
+}
+const fraseAV = (s,i) => s.map((k,j)=> k.sp?' ': j===i?`<mark>${esc(k.t)}</mark>`:esc(k.t)).join('');
+function qAVTiempo(){
+  const {s,i,k}=elegirAV(k=>!esFNP(k));
+  const otros=shuffle(ALLT.filter(id=>id!==k.c)).slice(0,3);
+  return {tipo:'test', tema:'Análisis de verbos', enun:'¿En qué tiempo y modo está el verbo marcado?', frase:fraseAV(s,i), opciones:shuffle([k.c,...otros]).map(id=>tLab(TI[id])), resp:tLab(TI[k.c]), exp:avDesc(k)};
+}
+const MISMA13 = ['impf','cond','spres','simpf','sfut','plus','condc','sppc','splus','sfutc'];
+function qAVPersona(){
+  const {s,i,k}=elegirAV(k=>!esFNP(k));
+  let pool=[0,1,2,3,4,5].filter(x=>x!==k.p); if(MISMA13.includes(k.c) && (k.p===0||k.p===2)) pool=pool.filter(x=>x!==0&&x!==2);
+  return {tipo:'test', tema:'Análisis de verbos', enun:'¿Qué persona y número tiene el verbo marcado?', sub:'Fíjate en quién hace la acción', frase:fraseAV(s,i), opciones:shuffle([k.p,...shuffle(pool).slice(0,3)]).map(x=>PERS[x].lab), resp:PERS[k.p].lab, exp:avDesc(k)};
+}
+function qAVConj(){
+  const {s,i,k}=elegirAV(()=>true);
+  const op=['1ª conjugación (-ar)','2ª conjugación (-er)','3ª conjugación (-ir)'];
+  return {tipo:'test', tema:'Análisis de verbos', enun:'¿De qué verbo y conjugación es la forma marcada?', frase:fraseAV(s,i), opciones:op.map((o,g)=>o), resp:conjN(k.inf), exp:avDesc(k)};
+}
+function qAVCompleto(){
+  const {s,i,k}=elegirAV(k=>!esFNP(k));
+  const t=TI[k.c], lab=(p,tid,inf)=>`${PERS[p].lab} · ${tLab(TI[tid])} · ${inf} (${conjN(inf).split(' (')[0]})`;
+  const ok=lab(k.p,k.c,k.inf);
+  const otP = [0,1,2,3,4,5].filter(x=>x!==k.p && !(MISMA13.includes(k.c)&&(k.p===0||k.p===2)&&(x===0||x===2)));
+  const c=uniq([lab(pick(otP),k.c,k.inf), lab(k.p,pick(ALLT.filter(x=>x!==k.c)),k.inf), lab(pick(otP),pick(ALLT.filter(x=>x!==k.c)),k.inf), lab(k.p,pick(ALLT.filter(x=>x!==k.c && TI[x].m!==t.m)),k.inf)]).filter(x=>x!==ok);
+  return {tipo:'test', tema:'Análisis completo', enun:'Elige el análisis correcto del verbo marcado', frase:fraseAV(s,i), opciones:shuffle([ok,...c.slice(0,3)]), resp:ok, exp:avDesc(k)};
+}
+
 /* ============ MUNDOS Y NIVELES ============ */
 function mix(list){ const tot=list.reduce((a,x)=>a+x[0],0); let r=Math.random()*tot; for(const [w,f] of list){ if((r-=w)<0) return f(); } return list[0][1](); }
 const MUNDOS = [
@@ -1079,6 +1163,11 @@ const MUNDOS = [
    {n:'Tiempos simples', d:'Raíz y desinencia, conjugaciones y tiempos simples de indicativo', g:()=>mix([[4,()=>qIdent(IND_S,IND_S,REG_SIMPLE)],[2,()=>qEscribir(REG_SIMPLE,IND_S)],[2,()=>qPersona(REG_SIMPLE,IND_S)],[1,()=>qBello(IND_S)],[2,()=>qRaiz()],[1,()=>qConjugacion()]])},
    {n:'Tiempos compuestos', d:'Haber + participio: antepresente, antecopretérito…', g:()=>mix([[4,()=>qIdent(IND_C,IND,REG)],[2,()=>qSimpleComp(REG,IND)],[3,()=>qEscribir(REG,IND_C)],[2,()=>qBello(IND_C)]])},
    {n:'Modo subjuntivo', d:'Que yo cante, que yo haya cantado…', g:()=>mix([[4,()=>qIdent(SUB,ALLT,REG)],[2,()=>qModo(REG,ALLT)],[3,()=>qEscribir(REG,['spres','simpf','sppc','splus'])],[1,()=>qPersona(REG,SUB)],[1,()=>qBello(ALLT)]])},
+ ]},
+ {id:'analisis', nombre:'Análisis de verbos', desc:'Analiza los verbos de un texto', col:'--c14', ico:'≡', niveles:[
+   {n:'Encuentra los verbos', d:'¿Indicativo, subjuntivo o forma no personal?', g:()=>mix([[3,()=>qAVTocar()],[3,()=>qAVModo()],[1,()=>qAVConj()]])},
+   {n:'Tiempo y persona', d:'Persona, número, tiempo y modo', g:()=>mix([[3,()=>qAVTiempo()],[3,()=>qAVPersona()],[1,()=>qAVConj()]])},
+   {n:'Análisis completo', d:'Todo junto, como en clase', g:()=>mix([[4,()=>qAVCompleto()],[2,()=>qAVTiempo()],[1,()=>qAVModo()]])},
  ]},
  {id:'irregulares', nombre:'Verbos irregulares', desc:'Tener, hacer, caber, andar, conducir…', col:'--c2', ico:'!', niveles:[
    {n:'Presente y pasado', d:'Yo quepo, él anduvo, nosotros hicimos', g:()=>mix([[4,()=>qIrrTest(['pres','pps'])],[1,()=>qIrrEscribir(['pres','pps'])]])},
@@ -1367,6 +1456,13 @@ function vTeoria(mi){
     <h3>Imperativos irregulares (tú)</h3>${tb(['tener','hacer','decir','poner'])}${tb(['venir','salir','ser','ir'])}
     <h3>Formas no personales</h3><p>No indican persona ni número.</p><div class="tbl"><table><thead><tr><th></th><th>amar</th><th>comer</th><th>vivir</th></tr></thead><tbody>
     ${FNP.map((n,i)=>`<tr><th>${n}</th>${['amar','comer','vivir'].map(x=>{const v=VERBO[x]; return `<td>${[v.inf,gerundio(v),part(v),'haber '+part(v),'habiendo '+part(v)][i]}</td>`;}).join('')}</tr>`).join('')}</tbody></table></div>`; }
+  if(m.id==='analisis') h = `<p>Para <b>analizar un verbo</b> de un texto, di en este orden:</p>
+    <ol><li><b>Infinitivo</b> y <b>conjugación</b> (1ª -ar, 2ª -er, 3ª -ir).</li><li><b>Persona</b> (1ª, 2ª, 3ª) y <b>número</b> (singular o plural): piensa en quién hace la acción.</li><li><b>Tiempo</b> (simple o compuesto) y <b>modo</b> (indicativo o subjuntivo).</li></ol>
+    <div class="tbl"><table><thead><tr><th>Verbo</th><th>Infinitivo</th><th>Persona y número</th><th>Tiempo</th><th>Modo</th></tr></thead><tbody>
+    <tr><td>viajaremos</td><td>viajar (1ª)</td><td>1ª plural</td><td>futuro simple</td><td>indicativo</td></tr>
+    <tr><td>había salido</td><td>salir (3ª)</td><td>3ª singular</td><td>pretérito pluscuamperfecto</td><td>indicativo</td></tr>
+    <tr><td>tuviera</td><td>tener (2ª)</td><td>1ª singular</td><td>pretérito imperfecto</td><td>subjuntivo</td></tr></tbody></table></div>
+    <h3>Trampas</h3><ul><li>No todo lo que parece verbo está en indicativo: <i>si encontrara</i> es subjuntivo.</li><li><b>Infinitivo, gerundio y participio</b> son formas no personales: no tienen persona ni tiempo (<i>navegar, leyendo, escondido</i>).</li><li>El <b>condicional</b> (compraría) es del modo indicativo.</li><li>Formas iguales para yo y él (<i>era, contaba</i>): mira el contexto para saber la persona.</li></ul>`;
   if(m.id==='vocabulario') h = `<p>Las palabras se agrupan de dos maneras:</p><div class="tgrid">
     <div class="tbox"><b>Según su forma: familias de palabras</b><p style="margin:4px 0 0">Conjunto de palabras que tienen la misma raíz: <i>noche, anoche, anochecer, medianoche…</i></p></div>
     <div class="tbox"><b>Según su significado: campos semánticos</b><p style="margin:4px 0 0">Conjunto de palabras que tienen una parte de su significado en común: <i>mañana, tarde, noche…</i> (momentos del día).</p></div></div>
