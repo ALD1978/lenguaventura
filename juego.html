@@ -696,7 +696,10 @@ const RASGOS = [
  ['Los textos históricos se escriben en futuro.',false],['Se pueden escribir en pasado o en presente histórico.',true],['Los conectores temporales sirven para organizar la información.',true],
  ['Los textos históricos casi nunca incluyen fechas ni datos.',false],['La introducción cuenta el final del suceso.',false],['Suelen ir acompañados de mapas, imágenes u organizadores gráficos.',true],
  ['La conclusión presenta el final o las consecuencias del hecho histórico.',true],['El título presenta la idea principal.',true],['Los hechos se cuentan de más moderno a más antiguo.',false],
- ['El presente histórico usa el presente para contar hechos pasados.',true]];
+ ['El presente histórico usa el presente para contar hechos pasados.',true],
+ ['Los textos históricos narran acontecimientos relevantes del pasado.',true],['Los textos históricos cuentan cosas inventadas, como los cuentos.',false],
+ ['Los mapas e imágenes ayudan a comprender cuándo sucedieron los acontecimientos.',true],['«Más tarde», «antes» y «después» son conectores temporales.',true],
+ ['El desarrollo presenta los personajes, la causa, el tiempo y el lugar.',false]];
 function qParte(){
   const T=pick(TEXTOS), k=pick(['t','i','d','c']), lab={t:'Título',i:'Introducción',d:'Desarrollo',c:'Conclusión'}[k];
   return {tipo:'test', tema:'Estructura', enun:'¿Qué parte del texto histórico es esta?', frase:esc(T[k]), opciones:PARTES, resp:lab, exp:PARTES_EXP[lab]};
@@ -1243,7 +1246,7 @@ function vTeoria(mi){
   if(m.id==='recursos') h = `<p>Los <b>recursos literarios</b> son figuras que se emplean en textos, tanto en verso como en prosa, para dar expresividad y conseguir un efecto específico.</p>
     <div class="tgrid">${Object.keys(REC).map(k=>`<div class="tbox"><b>${REC[k].n}</b><p style="margin:4px 0 0">${REC[k].d}</p><p class="muted" style="margin:4px 0 0"><i>${REC_EJ.find(x=>x[0]===k)[1]}</i></p></div>`).join('')}</div>
     <h3>Truco: metáfora o comparación</h3><p>Si aparece <b>como</b>, <b>igual que</b> o <b>parece</b>, es comparación (tus ojos son <b>como</b> luceros). Si no aparece, es metáfora (tus ojos son luceros).</p>`;
-  if(m.id==='historico') h = `<p>Los <b>textos históricos</b> cuentan hechos del pasado ordenados de manera cronológica, de más antiguo a más moderno. Utilizan <b>conectores temporales</b> para organizar la información (más tarde, antes, después…) e incluyen gran cantidad de datos y fechas. Se escriben en <b>pasado</b> o en <b>presente histórico</b>. Suelen ir acompañados de mapas, imágenes u organizadores gráficos.</p>
+  if(m.id==='historico') h = `<p>Los <b>textos históricos</b> narran acontecimientos relevantes del pasado ordenados de manera cronológica, de más antiguo a más moderno. Utilizan <b>conectores temporales</b> para organizar la información (más tarde, antes, después…) e incluyen gran cantidad de datos y fechas. Se escriben en <b>pasado</b> o en <b>presente histórico</b>. Suelen ir acompañados de mapas, imágenes u organizadores gráficos.</p>
     <h3>Estructura</h3><div class="tgrid">${PARTES.map(x=>`<div class="tbox"><b>${x}</b><p style="margin:4px 0 0">${PARTES_EXP[x]}</p></div>`).join('')}</div>
     <h3>Lecturas del juego</h3>${TEXTOS.map(T=>`<div class="lectura"><span class="parte">Título</span><h3 style="margin:2px 0 4px">${T.t}</h3><span class="parte">Introducción</span><p>${T.i}</p><span class="parte">Desarrollo</span><p>${T.d}</p><span class="parte">Conclusión</span><p>${T.c}</p></div>`).join('')}`;
   if(m.id==='adjetivos') h = `<p>El <b>adjetivo calificativo</b> dice cómo es el sustantivo y concuerda con él en género y número (casa blanca, coches blancos).</p>
