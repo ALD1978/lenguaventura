@@ -1091,6 +1091,34 @@ const AV_SRC = [
  'Ojalá {haga|hacer|spres|2} sol el sábado, porque {queremos|querer|pres|3} ir a la playa.',
  'Tú siempre {corres|correr|pres|1} muy deprisa cuando {juegas|jugar|pres|1} al fútbol.',
  'Los niños {estaban|estar|impf|5} {cantando|cantar|ger} cuando {sonó|sonar|pps|2} el timbre.',
+ 'El sábado pasado, Marta {celebró|celebrar|pps|2} su cumpleaños en el jardín.',
+ 'Sus amigos {llegaron|llegar|pps|5} temprano y {trajeron|traer|pps|5} muchos regalos.',
+ 'Mientras todos {comían|comer|impf|5} tarta, el perro {robó|robar|pps|2} un globo {atado|atar|part} a una silla.',
+ 'Marta {ha guardado|guardar|ppc|2} todas las fotos en un álbum.',
+ 'El año que viene {invitará|invitar|fut|2} a toda la clase.',
+ 'Si {hiciera|hacer|simpf|2} buen tiempo, {organizaría|organizar|cond|2} una fiesta en la piscina.',
+ 'Mañana nuestra clase {visitará|visitar|fut|2} el Museo de Ciencias.',
+ 'La profesora nos {ha pedido|pedir|ppc|2} que {llevemos|llevar|spres|3} un cuaderno.',
+ 'El curso pasado {fuimos|ir|pps|3} al planetario y {vimos|ver|pps|3} un eclipse {proyectado|proyectar|part} en la cúpula.',
+ 'Mi amigo Pablo {estaba|estar|impf|2} tan emocionado que no {paraba|parar|impf|2} de {hacer|hacer|inf} preguntas.',
+ 'Cuando {volvamos|volver|spres|3}, ya {habremos aprendido|aprender|futc|3} muchas cosas sobre el universo.',
+ 'En lo alto de la colina {hay|haber|pres|2} un castillo medieval.',
+ 'Hace siglos, allí {vivía|vivir|impf|2} un rey que {coleccionaba|coleccionar|impf|2} espadas.',
+ 'Los historiadores {han encontrado|encontrar|ppc|5} monedas de oro bajo el patio.',
+ 'Antes de que {llegaran|llegar|simpf|5} los arqueólogos, los vecinos ya {habían descubierto|descubrir|plus|5} un pasadizo secreto.',
+ 'Algún día yo {subiré|subir|fut|0} a la torre más alta para {contemplar|contemplar|inf} el valle.',
+ 'Ayer por la tarde, el cielo se {oscureció|oscurecer|pps|2} de repente.',
+ 'Primero {sopló|soplar|pps|2} un viento fuerte y después {empezó|empezar|pps|2} a {llover|llover|inf} con fuerza.',
+ 'Mi hermano y yo {mirábamos|mirar|impf|3} los relámpagos desde la ventana.',
+ 'Mamá nos {dijo|decir|pps|2} que {cerráramos|cerrar|simpf|3} las persianas.',
+ 'Hoy el parque {está|estar|pres|2} lleno de charcos y las flores {parecen|parecer|pres|5} más verdes.',
+ 'Si no {hubiera llovido|llover|splus|2}, {habríamos ido|ir|condc|3} al cine.',
+ 'El viernes {será|ser|fut|2} el concurso de talentos del colegio.',
+ 'Lucía {lleva|llevar|pres|2} semanas {ensayando|ensayar|ger} una canción.',
+ 'Tú {tocarás|tocar|fut|1} el piano y yo {bailaré|bailar|fut|0}.',
+ 'El año pasado, el grupo de sexto {ganó|ganar|pps|2} el primer premio.',
+ 'Ojalá este año nos {elijan|elegir|spres|5} a nosotros.',
+ 'Cuando {termine|terminar|spres|2} la actuación, todos {habrán disfrutado|disfrutar|futc|5} muchísimo.',
 ];
 const FNP_LAB = {inf:'infinitivo', ger:'gerundio', part:'participio'};
 function parseAV(src){
@@ -1457,6 +1485,7 @@ function vTeoria(mi){
     <tr><td>viajaremos</td><td>viajar (1ª)</td><td>1ª plural</td><td>futuro simple</td><td>indicativo</td></tr>
     <tr><td>había salido</td><td>salir (3ª)</td><td>3ª singular</td><td>pretérito pluscuamperfecto</td><td>indicativo</td></tr>
     <tr><td>tuviera</td><td>tener (2ª)</td><td>1ª singular</td><td>pretérito imperfecto</td><td>subjuntivo</td></tr></tbody></table></div>
+    <p><a class="btn" href="fichas.html" target="_blank" rel="noopener">Fichas para imprimir</a></p>
     <h3>Trampas</h3><ul><li>No todo lo que parece verbo está en indicativo: <i>si encontrara</i> es subjuntivo.</li><li><b>Infinitivo, gerundio y participio</b> son formas no personales: no tienen persona ni tiempo (<i>navegar, leyendo, escondido</i>).</li><li>El <b>condicional</b> (compraría) es del modo indicativo.</li><li>Formas iguales para yo y él (<i>era, contaba</i>): mira el contexto para saber la persona.</li></ul>`;
   if(m.id==='vocabulario') h = `<p>Las palabras se agrupan de dos maneras:</p><div class="tgrid">
     <div class="tbox"><b>Según su forma: familias de palabras</b><p style="margin:4px 0 0">Conjunto de palabras que tienen la misma raíz: <i>noche, anoche, anochecer, medianoche…</i></p></div>
